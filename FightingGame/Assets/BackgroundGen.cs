@@ -1,0 +1,112 @@
+using UnityEngine;
+
+public class BackgroundGen : MonoBehaviour
+{
+    [Header("Dimensions")]
+    public int textureWidth = 1024;
+    public int textureHeight = 256;
+
+    [Header("Noise Settings")]
+    public float noiseScale = 0.005f;
+    public float seed;
+
+    [Header("Octaves")]
+    [Range(1, 8)]
+    public int octaves = 4;
+    [Range(0f, 1f)]
+    public float persistence = 0.5f;
+    public float lacunarity = 2f;
+
+    [Header("Color Settings")]
+    public Color groundColor = new Color(0.4f, 0.2f, 0.1f);
+    public Color skyColor = new Color(0.5f, 0.8f, 1.0f);
+
+    [Header("Scrolling")]
+    public float scrollSpeed = 0.5f;
+
+    private Texture2D texture;
+    private Color[] pixelData;
+    private MeshRenderer quadRenderer;
+    private int nextColumnToGenerate = 0;
+    private float totalOffset = 0;
+
+    void Start()
+    {
+        quadRenderer = GetComponent<MeshRenderer>();
+        texture = new Texture2D(textureWidth, textureHeight);
+        texture.wrapMode = TextureWrapMode.Repeat;
+        pixelData = new Color[textureWidth * textureHeight];
+        if (seed == 0) { seed = Random.Range(0f, 100f); }
+
+        for (int x = 0; x < textureWidth; x++)
+        {
+            GenerateColumn(x, x);
+        }
+        ApplyPixelDataToTexture();
+        quadRenderer.material.mainTexture = texture;
+    }
+
+    void Update()
+    {
+        float scrollThisFrame = scrollSpeed * Time.deltaTime;
+        totalOffset += scrollThisFrame;
+        quadRenderer.material.mainTextureOffset = new Vector2(totalOffset, 0);
+
+        int currentGlobalPixel = Mathf.FloorToInt(totalOffset * textureWidth);
+        int pixelsToGenerate = currentGlobalPixel - nextColumnToGenerate;
+
+        if (pixelsToGenerate > 0)
+        {
+            for (int i = 0; i < pixelsToGenerate; i++)
+            {
+                int globalColumnIndex = nextColumnToGenerate + i;
+                int localColumnIndex = globalColumnIndex % textureWidth;
+                GenerateColumn(localColumnIndex, globalColumnIndex);
+            }
+
+            ApplyPixelDataToTexture();
+            nextColumnToGenerate += pixelsToGenerate;
+        }
+    }
+
+    void GenerateColumn(int localX, int globalX)
+    {
+        float totalNoiseValue = 0;
+        float frequency = noiseScale;
+        float amplitude = 1f;
+        float maxAmplitude = 0;
+
+        for (int i = 0; i < octaves; i++)
+        {
+            float noiseX = ((float)globalX * frequency) + seed;
+            float perlinValue = Mathf.PerlinNoise(noiseX, seed);
+
+            totalNoiseValue += perlinValue * amplitude;
+            maxAmplitude += amplitude;
+            amplitude *= persistence;
+            frequency *= lacunarity;
+        }
+
+        float normalizedNoise = totalNoiseValue / maxAmplitude;
+        int height = Mathf.RoundToInt(normalizedNoise * textureHeight);
+
+        for (int y = 0; y < textureHeight; y++)
+        {
+            int pixelIndex = y * textureWidth + localX;
+            if (y < height)
+            {
+                pixelData[pixelIndex] = groundColor;
+            }
+            else
+            {
+                pixelData[pixelIndex] = skyColor;
+            }
+        }
+    }
+
+    void ApplyPixelDataToTexture()
+    {
+        texture.SetPixels(pixelData);
+        texture.Apply();
+    }
+}
