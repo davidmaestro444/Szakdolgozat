@@ -1,4 +1,5 @@
 using Spine;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -17,6 +18,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private BoxCollider2D groundCheck;
     [SerializeField] private LayerMask groundMask;
 
+    public GameObject attackHitbox;
+    public float attackDuration = 0.3f;
     public KnightControl knightControl;
     public Transform knightVisuals;
     private bool grounded;
@@ -53,6 +56,7 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0) && currentState != PlayerState.Attacking && grounded)
         {
             SetState(PlayerState.Attacking);
+            StartCoroutine(AttackSequence());
         }
         else if (Input.GetButtonDown("Vertical") && grounded)
         {
@@ -71,6 +75,12 @@ public class PlayerMovement : MonoBehaviour
                 SetState(PlayerState.Idle);
             }
         }
+    }
+    IEnumerator AttackSequence()
+    {
+        attackHitbox.SetActive(true);
+        yield return new WaitForSeconds(attackDuration);
+        attackHitbox.SetActive(false);
     }
 
     private void SetState(PlayerState newState)
