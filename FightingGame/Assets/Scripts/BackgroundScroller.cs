@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BackgroundScroller : MonoBehaviour
 {
-    [Tooltip("A görgetés sebessége. Pozitív érték jobbra, negatív balra mozgatja.")]
+    //pozitív jobbra görget, negatív balra
     public float scrollSpeed = 0.1f;
     private Renderer quadRenderer;
 

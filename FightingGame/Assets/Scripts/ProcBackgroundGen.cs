@@ -2,25 +2,12 @@ using UnityEngine;
 
 public class ProcBackgroundGen : MonoBehaviour
 {
-    [Header("Dimensions")]
-    [Tooltip("A generált textúra szélessége pixelben.")]
     public int textureWidth = 512;
-    [Tooltip("A generált textúra magassága pixelben.")]
     public int textureHeight = 256;
-
-    [Header("Noise Settings")]
-    [Tooltip("A zaj 'nagyítása'. Kisebb érték = simább, elnyújtottabb táj. Nagyobb érték = sûrûbb, hegyesebb táj.")]
     public float noiseScale = 0.1f;
-    [Tooltip("A generálás kiindulópontja. Ugyanazzal a seed-del mindig ugyanazt a tájat kapod.")]
     public float seed;
-
-    [Header("Color Settings")]
-    [Tooltip("A 'föld' színe.")]
     public Color groundColor = Color.black;
-    [Tooltip("Az 'ég' színe.")]
     public Color skyColor = Color.blue;
-
-    [Tooltip("A Quad objektum MeshRenderer komponense, amire a textúrát tesszük.")]
     [SerializeField] private MeshRenderer backgroundQuadRenderer;
 
     void Start()

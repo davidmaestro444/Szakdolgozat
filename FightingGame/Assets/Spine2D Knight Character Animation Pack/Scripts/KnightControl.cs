@@ -48,6 +48,9 @@ public class KnightControl : MonoBehaviour
     // Spine.AnimationState and Spine.Skeleton are not Unity-serialized objects. You will not see them as fields in the inspector.
     public Spine.AnimationState spineAnimationState;
     public Spine.Skeleton skeleton;
+    public float attackAnimationSpeed = 2f;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -68,9 +71,9 @@ public class KnightControl : MonoBehaviour
     {
         spineAnimationState.SetAnimation(0, idleAnimationName, true);
     }
-    public void jump()
+    public Spine.TrackEntry jump()
     {
-        spineAnimationState.SetAnimation(0, jumpAnimationName, true);
+        return spineAnimationState.SetAnimation(0, jumpAnimationName, false);
     }
     public void getHit()
     {
@@ -78,15 +81,17 @@ public class KnightControl : MonoBehaviour
     }
     public void death()
     {
-        spineAnimationState.SetAnimation(0, deathAnimationName, true);
+        spineAnimationState.SetAnimation(0, deathAnimationName, false);
     }
     public void stun()
     {
         spineAnimationState.SetAnimation(0, stunAnimationName, true);
     }
-    public void attack_1()
+    public Spine.TrackEntry attack_1()
     {
-        spineAnimationState.SetAnimation(0, atkAnimationName_1, true);
+        TrackEntry trackEntry = spineAnimationState.SetAnimation(0, atkAnimationName_1, false);
+        trackEntry.TimeScale = attackAnimationSpeed;
+        return trackEntry;
     }
     public void attack_2()
     {
