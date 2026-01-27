@@ -178,4 +178,11 @@ public class EnemyAI : MonoBehaviour
         yield return new WaitForSeconds(attackDuration);
         attackHitbox.SetActive(false);
     }
+
+    public void Die()
+    {
+        isAiActive = false;
+        rb.linearVelocity = Vector2.zero;
+        knightControl.death();
+    }
 }

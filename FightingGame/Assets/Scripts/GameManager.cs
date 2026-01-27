@@ -80,37 +80,26 @@ public class GameManager : MonoBehaviour
         else
             opponentInstance.transform.position = opponentPos;
 
-        playerInstance.SetActive(true);
-        opponentInstance.SetActive(true);
+        playerInstance.GetComponent<DamageBox>().ResetCharacter();
+        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
 
         opponentInstance.GetComponent<EnemyAI>().player = playerInstance.transform;
 
-        SetGameState(GameState.Dueling);
+        playerInstance.GetComponent<PlayerMovement>().enabled = true;
+        opponentInstance.GetComponent<EnemyAI>().SetAIActive(true);
+        currentState = GameState.Dueling;
     }
 
     void SetGameState(GameState newState)
     {
         currentState = newState;
-
-        switch (currentState)
-        {
-            case GameState.Dueling:
-                playerInstance.GetComponent<PlayerMovement>().enabled = true;
-                opponentInstance.GetComponent<EnemyAI>().SetAIActive(true);
-                break;
-            case GameState.PlayerAdvancing:
-                opponentInstance.GetComponent<EnemyAI>().SetAIActive(false);
-                break;
-            case GameState.EnemyAdvancing:
-                playerInstance.GetComponent<PlayerMovement>().enabled = false;
-                break;
-        }
     }
 
     public void OnCharacterDied(GameObject character)
     {
         if (character.CompareTag("Player"))
         {
+            character.GetComponent<PlayerMovement>().enabled = false;
             SetGameState(GameState.EnemyAdvancing);
             StartCoroutine(Respawn(playerInstance, opponentInstance));
         }
@@ -124,7 +113,7 @@ public class GameManager : MonoBehaviour
     private IEnumerator Respawn(GameObject loser, GameObject winner)
     {
         yield return new WaitForSeconds(respawnDelay);
-
+        loser.GetComponent<DamageBox>().ResetCharacter();
         Transform respawnPoint = FindBestSpawnPoint(winner);
 
         if (respawnPoint == null)

@@ -79,9 +79,9 @@ public class KnightControl : MonoBehaviour
     {
         spineAnimationState.SetAnimation(0, hitAnimationName, true);
     }
-    public void death()
+    public Spine.TrackEntry death()
     {
-        spineAnimationState.SetAnimation(0, deathAnimationName, false);
+        return spineAnimationState.SetAnimation(0, deathAnimationName, false);
     }
     public void stun()
     {
