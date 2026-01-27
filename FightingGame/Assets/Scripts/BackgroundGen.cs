@@ -2,26 +2,17 @@ using UnityEngine;
 
 public class BackgroundGen : MonoBehaviour
 {
-    [Header("Dimensions")]
     public int textureWidth = 1024;
     public int textureHeight = 256;
-
-    [Header("Noise Settings")]
     public float noiseScale = 0.005f;
     public float seed;
-
-    [Header("Octaves")]
     [Range(1, 8)]
     public int octaves = 4;
     [Range(0f, 1f)]
     public float persistence = 0.5f;
     public float lacunarity = 2f;
-
-    [Header("Color Settings")]
     public Color groundColor = new Color(0.4f, 0.2f, 0.1f);
     public Color skyColor = new Color(0.5f, 0.8f, 1.0f);
-
-    [Header("Scrolling")]
     public float scrollSpeed = 0.5f;
 
     private Texture2D texture;

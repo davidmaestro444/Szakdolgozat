@@ -1,4 +1,5 @@
 using Spine;
+using System.Collections;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
@@ -30,6 +31,9 @@ public class EnemyAI : MonoBehaviour
     private bool grounded;
 
     private float horizontalMovement = 0f;
+
+    public GameObject attackHitbox;
+    public float attackDuration = 0.3f;
 
     void Start()
     {
@@ -120,6 +124,7 @@ public class EnemyAI : MonoBehaviour
             case EnemyState.Attacking:
                 lastAttackTime = Time.time;
                 currentActionTrack = knightControl.attack_1();
+                StartCoroutine(AttackSequence());
                 break;
             case EnemyState.Jumping:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
@@ -129,7 +134,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    void FlipCharacter(float moveDirection)
+        void FlipCharacter(float moveDirection)
     {
         if (moveDirection > 0 && transform.localScale.x < 0f || moveDirection < 0 && transform.localScale.x > 0f)
         {
@@ -166,5 +171,11 @@ public class EnemyAI : MonoBehaviour
         {
             SetState(EnemyState.Chasing);
         }
+    }
+    IEnumerator AttackSequence()
+    {
+        attackHitbox.SetActive(true);
+        yield return new WaitForSeconds(attackDuration);
+        attackHitbox.SetActive(false);
     }
 }

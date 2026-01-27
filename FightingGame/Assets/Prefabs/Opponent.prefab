@@ -32,7 +32,8 @@ Transform:
   m_LocalPosition: {x: 0.03, y: -0.72, z: 0}
   m_LocalScale: {x: 0.53, y: 0.48, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6794090564207188109}
   m_Father: {fileID: 8008305332276056147}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6453622299265306267
@@ -352,7 +353,6 @@ Transform:
   - {fileID: 6424857543185337156}
   - {fileID: 2229762293486186273}
   - {fileID: 7111528600849446540}
-  - {fileID: 6794090564207188109}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &721499955835506738
@@ -414,6 +414,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   player: {fileID: 0}
+  attackHitbox: {fileID: 4779167275368627179}
+  attackDuration: 0.3
 --- !u!61 &-7751802958424547721
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -549,7 +551,7 @@ GameObject:
   - component: {fileID: 6794090564207188109}
   - component: {fileID: 4716624725643649300}
   - component: {fileID: 3145227898439782037}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: SwordHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -564,12 +566,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4779167275368627179}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.83, y: -0.22, z: 0}
-  m_LocalScale: {x: 0.94, y: 0.66, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.509434, y: 1.0416667, z: 0}
+  m_LocalScale: {x: 1.773585, y: 1.3750001, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8008305332276056147}
+  m_Father: {fileID: 7111528600849446540}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &4716624725643649300
 BoxCollider2D:

@@ -36,7 +36,6 @@ Transform:
   - {fileID: 5362195951857916024}
   - {fileID: 6562239578131647742}
   - {fileID: 987675729830751980}
-  - {fileID: 6132157536338035707}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &7451562961646730810
@@ -355,7 +354,7 @@ GameObject:
   - component: {fileID: 6132157536338035707}
   - component: {fileID: 7794471465862847533}
   - component: {fileID: 5604929495990309367}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: SwordHitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -370,12 +369,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8022567884287867458}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.83, y: -0.22, z: 0}
-  m_LocalScale: {x: 0.94, y: 0.66, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.509434, y: 1.0416667, z: 0}
+  m_LocalScale: {x: 1.773585, y: 1.3750001, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1895867826049007740}
+  m_Father: {fileID: 987675729830751980}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &7794471465862847533
 BoxCollider2D:
@@ -467,7 +466,8 @@ Transform:
   m_LocalPosition: {x: 0.03, y: -0.72, z: 0}
   m_LocalScale: {x: 0.53, y: 0.48, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 6132157536338035707}
   m_Father: {fileID: 1895867826049007740}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &8513586805270685724
