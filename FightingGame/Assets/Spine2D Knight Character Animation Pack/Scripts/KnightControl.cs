@@ -52,11 +52,14 @@ public class KnightControl : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         skeletonAnimation = GetComponent<SkeletonAnimation>();
-        spineAnimationState = skeletonAnimation.AnimationState;
-        skeleton = skeletonAnimation.Skeleton;
+        if (skeletonAnimation != null)
+        {
+            spineAnimationState = skeletonAnimation.AnimationState;
+            skeleton = skeletonAnimation.Skeleton;
+        }
     }
 
     public void running()

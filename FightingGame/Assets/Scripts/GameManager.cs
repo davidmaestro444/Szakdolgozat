@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     public CinemachineCamera virtualCamera;
     public Transform cameraTarget;
     public float cameraMoveSpeed = 5f;
-    public float respawnDelay = 2f;
+    public float respawnDelay = 3f;
     public Transform playerInitialSpawn;
     public Transform opponentInitialSpawn;
     private List<Transform> spawnPoints = new List<Transform>();
@@ -80,19 +80,38 @@ public class GameManager : MonoBehaviour
         else
             opponentInstance.transform.position = opponentPos;
 
+        playerInstance.SetActive(true);
+        opponentInstance.SetActive(true);
+
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
-
-        opponentInstance.GetComponent<EnemyAI>().player = playerInstance.transform;
-
-        playerInstance.GetComponent<PlayerMovement>().enabled = true;
-        opponentInstance.GetComponent<EnemyAI>().SetAIActive(true);
-        currentState = GameState.Dueling;
+        SetGameState(GameState.Dueling);
     }
 
     void SetGameState(GameState newState)
     {
         currentState = newState;
+        if (playerInstance == null || opponentInstance == null) return;
+
+        var opponentAI = opponentInstance.GetComponent<EnemyAI>();
+        var playerMovement = playerInstance.GetComponent<PlayerMovement>();
+
+        switch (currentState)
+        {
+            case GameState.Dueling:
+                playerMovement.enabled = true;
+                opponentAI.StartDueling(playerInstance.transform);
+                break;
+
+            case GameState.PlayerAdvancing:
+                opponentAI.DeactivateAI();
+                break;
+
+            case GameState.EnemyAdvancing:
+                playerMovement.enabled = false;
+                opponentAI.StartAdvancing();
+                break;
+        }
     }
 
     public void OnCharacterDied(GameObject character)
@@ -100,6 +119,7 @@ public class GameManager : MonoBehaviour
         if (character.CompareTag("Player"))
         {
             character.GetComponent<PlayerMovement>().enabled = false;
+
             SetGameState(GameState.EnemyAdvancing);
             StartCoroutine(Respawn(playerInstance, opponentInstance));
         }
@@ -113,12 +133,14 @@ public class GameManager : MonoBehaviour
     private IEnumerator Respawn(GameObject loser, GameObject winner)
     {
         yield return new WaitForSeconds(respawnDelay);
+
         loser.GetComponent<DamageBox>().ResetCharacter();
+
         Transform respawnPoint = FindBestSpawnPoint(winner);
 
         if (respawnPoint == null)
         {
-            Debug.LogError("Nem található megfelelõ spawn pont a gyõztes elõtt!");
+            Debug.LogError("Nem található megfelelõ spawn pont! Újraindítás...");
             StartNewRound(playerInitialSpawn.position, opponentInitialSpawn.position);
             yield break;
         }
@@ -154,5 +176,10 @@ public class GameManager : MonoBehaviour
             }
             return candidatePoints.OrderByDescending(p => p.position.x).FirstOrDefault();
         }
+    }
+    public void EndGame(string winnerTag)
+    {
+        Debug.Log("JÁTÉK VÉGE! Gyõztes: " + winnerTag);
+        Time.timeScale = 0f;
     }
 }

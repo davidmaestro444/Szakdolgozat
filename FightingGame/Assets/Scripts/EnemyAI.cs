@@ -6,9 +6,11 @@ public class EnemyAI : MonoBehaviour
 {
     private enum EnemyState
     {
+        Idle,
         Chasing,
         Attacking,
-        Jumping
+        Jumping,
+        Advancing
     }
 
     public float speed = 4f;
@@ -16,41 +18,31 @@ public class EnemyAI : MonoBehaviour
     public float attackRange = 1.5f;
     public float jumpCheckDistance = 1f;
     public LayerMask groundLayer;
-
     public Transform player;
     private Rigidbody2D rb;
     private KnightControl knightControl;
     private BoxCollider2D bodyCollider;
-
     private bool isAiActive = false;
     private float attackCooldown = 2f;
     private float lastAttackTime;
-
-    private EnemyState currentState = EnemyState.Chasing;
+    private bool isDead = false;
+    private EnemyState currentState = EnemyState.Idle;
     private TrackEntry currentActionTrack;
     private bool grounded;
-
     private float horizontalMovement = 0f;
-
     public GameObject attackHitbox;
     public float attackDuration = 0.3f;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         knightControl = GetComponentInChildren<KnightControl>();
         bodyCollider = GetComponent<BoxCollider2D>();
-
-        if (player == null)
-        {
-            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-            if (playerObject != null) player = playerObject.transform;
-        }
     }
 
     void Update()
     {
-        if (!isAiActive || player == null)
+        if (!isAiActive)
         {
             horizontalMovement = 0;
             return;
@@ -70,17 +62,42 @@ public class EnemyAI : MonoBehaviour
 
     private void UpdateState()
     {
-        if (currentState == EnemyState.Jumping && grounded)
+        if (currentState == EnemyState.Jumping)
         {
-            SetState(EnemyState.Chasing);
-        }
-        else if (currentState == EnemyState.Attacking && currentActionTrack.IsComplete)
-        {
-            SetState(EnemyState.Chasing);
+            HandleMovementDirection();
+            if (grounded && rb.linearVelocity.y <= 0)
+            {
+                SetState(isAiActive && player == null ? EnemyState.Advancing : EnemyState.Chasing);
+            }
+            return;
         }
 
-        if (currentState != EnemyState.Attacking)
+        if (currentState == EnemyState.Attacking)
         {
+            horizontalMovement = 0;
+            if (currentActionTrack.IsComplete)
+            {
+                SetState(EnemyState.Chasing);
+            }
+            return;
+        }
+
+        if (currentState == EnemyState.Advancing)
+        {
+            horizontalMovement = -1f;
+            FlipCharacter(-1f);
+
+            if (ShouldJump() && grounded)
+            {
+                SetState(EnemyState.Jumping);
+            }
+            return;
+        }
+
+        if (currentState == EnemyState.Chasing || currentState == EnemyState.Idle)
+        {
+            if (player == null) return;
+
             float distanceToPlayer = Vector2.Distance(transform.position, player.position);
 
             if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown && grounded)
@@ -94,34 +111,44 @@ public class EnemyAI : MonoBehaviour
             else
             {
                 SetState(EnemyState.Chasing);
+                HandleMovementDirection();
             }
         }
+    }
 
-        switch (currentState)
+    private void HandleMovementDirection()
+    {
+        if (currentState == EnemyState.Advancing)
         {
-            case EnemyState.Chasing:
-            case EnemyState.Jumping:
-                float direction = player.position.x > transform.position.x ? 1 : -1;
-                horizontalMovement = direction;
-                FlipCharacter(direction);
-                break;
-            case EnemyState.Attacking:
-                horizontalMovement = 0;
-                break;
+            horizontalMovement = -1f;
+            FlipCharacter(-1f);
+        }
+        else if (player != null)
+        {
+            float direction = player.position.x > transform.position.x ? 1 : -1;
+            horizontalMovement = direction;
+            FlipCharacter(direction);
         }
     }
 
     private void SetState(EnemyState newState)
     {
-        if (newState == currentState) return;
+        if (newState == currentState && newState != EnemyState.Jumping) return;
+
         currentState = newState;
 
         switch (currentState)
         {
+            case EnemyState.Idle:
+                horizontalMovement = 0;
+                knightControl.idle();
+                break;
             case EnemyState.Chasing:
+            case EnemyState.Advancing:
                 knightControl.running();
                 break;
             case EnemyState.Attacking:
+                horizontalMovement = 0;
                 lastAttackTime = Time.time;
                 currentActionTrack = knightControl.attack_1();
                 StartCoroutine(AttackSequence());
@@ -134,7 +161,42 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-        void FlipCharacter(float moveDirection)
+    public void StartAdvancing()
+    {
+        isDead = false;
+        isAiActive = true;
+        player = null;
+        SetState(EnemyState.Advancing);
+    }
+
+    public void StartDueling(Transform playerTarget)
+    {
+        isDead = false;
+        isAiActive = true;
+        player = playerTarget;
+        SetState(EnemyState.Chasing);
+    }
+
+    public void DeactivateAI()
+    {
+        if (isDead) return;
+
+        isAiActive = false;
+        horizontalMovement = 0;
+        rb.linearVelocity = Vector2.zero;
+        SetState(EnemyState.Idle);
+    }
+
+    public void Die()
+    {
+        isDead = true;
+        isAiActive = false;
+        horizontalMovement = 0;
+        rb.linearVelocity = Vector2.zero;
+        knightControl.death();
+    }
+
+    void FlipCharacter(float moveDirection)
     {
         if (moveDirection > 0 && transform.localScale.x < 0f || moveDirection < 0 && transform.localScale.x > 0f)
         {
@@ -158,31 +220,13 @@ public class EnemyAI : MonoBehaviour
         grounded = Physics2D.OverlapBox(boxCenter, new Vector2(bodyCollider.bounds.size.x * 0.9f, 0.1f), 0f, groundLayer);
     }
 
-    public void SetAIActive(bool isActive)
-    {
-        isAiActive = isActive;
-        if (!isActive)
-        {
-            rb.linearVelocity = Vector2.zero;
-            horizontalMovement = 0;
-            knightControl.idle();
-        }
-        else
-        {
-            SetState(EnemyState.Chasing);
-        }
-    }
     IEnumerator AttackSequence()
     {
-        attackHitbox.SetActive(true);
-        yield return new WaitForSeconds(attackDuration);
-        attackHitbox.SetActive(false);
-    }
-
-    public void Die()
-    {
-        isAiActive = false;
-        rb.linearVelocity = Vector2.zero;
-        knightControl.death();
+        if (attackHitbox != null)
+        {
+            attackHitbox.SetActive(true);
+            yield return new WaitForSeconds(attackDuration);
+            attackHitbox.SetActive(false);
+        }
     }
 }
