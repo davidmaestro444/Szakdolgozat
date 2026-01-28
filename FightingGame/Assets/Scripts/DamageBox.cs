@@ -40,5 +40,16 @@ public class DamageBox : MonoBehaviour
         isDead = false;
         bodyCollider.enabled = true;
         rb.bodyType = RigidbodyType2D.Dynamic;
+        var playerMovement = GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+        {
+            playerMovement.ResetState();
+        }
+
+        var enemyAI = GetComponent<EnemyAI>();
+        if (enemyAI != null)
+        {
+            enemyAI.ResetState();
+        }
     }
 }

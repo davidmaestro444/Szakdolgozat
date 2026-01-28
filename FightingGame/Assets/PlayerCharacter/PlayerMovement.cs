@@ -122,4 +122,13 @@ public class PlayerMovement : MonoBehaviour
     {
         grounded = Physics2D.OverlapAreaAll(groundCheck.bounds.min, groundCheck.bounds.max, groundMask).Length > 0;
     }
+
+    public void ResetState()
+    {
+        knightControl.idle();
+        currentState = PlayerState.Idle;
+        body.linearVelocity = Vector2.zero;
+        attackHitbox.SetActive(false);
+        StopAllCoroutines();
+    }
 }

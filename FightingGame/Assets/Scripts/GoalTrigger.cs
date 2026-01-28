@@ -8,7 +8,6 @@ public class GoalTrigger : MonoBehaviour
     {
         if (other.CompareTag(targetTag))
         {
-            Debug.Log("JÁTÉK VÉGE! A gyõztes: " + targetTag);
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.EndGame(targetTag);

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -22,7 +23,8 @@ public class GameManager : MonoBehaviour
 
     private GameObject playerInstance;
     private GameObject opponentInstance;
-
+    public int spawnIndexOffset = 1;
+    public TextMeshProUGUI countdownText;
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(this); }
@@ -36,8 +38,7 @@ public class GameManager : MonoBehaviour
         {
             spawnPoints.Add(spo.transform);
         }
-
-        StartNewRound(playerInitialSpawn.position, opponentInitialSpawn.position);
+        StartCoroutine(StartGameSequence());
     }
 
     void Update()
@@ -67,8 +68,28 @@ public class GameManager : MonoBehaviour
 
         cameraTarget.position = Vector3.Lerp(cameraTarget.position, targetPosition, Time.deltaTime * cameraMoveSpeed);
     }
+    IEnumerator StartGameSequence()
+    {
+        CreateCharacters(playerInitialSpawn.position, opponentInitialSpawn.position);
+        currentState = GameState.Dueling;
+        cameraTarget.position = (playerInitialSpawn.position + opponentInitialSpawn.position) / 2;
+        playerInstance.GetComponent<PlayerMovement>().enabled = false;
+        opponentInstance.GetComponent<EnemyAI>().DeactivateAI();
+        countdownText.gameObject.SetActive(true);
+        int count = 3;
+        while (count > 0)
+        {
+            countdownText.text = count.ToString();
+            yield return new WaitForSeconds(1f);
+            count--;
+        }
+        countdownText.text = "FIGHT!";
+        yield return new WaitForSeconds(0.5f);
 
-    void StartNewRound(Vector3 playerPos, Vector3 opponentPos)
+        countdownText.gameObject.SetActive(false);
+        SetGameState(GameState.Dueling);
+    }
+    void CreateCharacters(Vector3 playerPos, Vector3 opponentPos)
     {
         if (playerInstance == null)
             playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
@@ -85,6 +106,13 @@ public class GameManager : MonoBehaviour
 
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
+
+        opponentInstance.GetComponent<EnemyAI>().player = playerInstance.transform;
+    }
+
+    void StartNewRound(Vector3 playerPos, Vector3 opponentPos)
+    {
+        CreateCharacters(playerPos, opponentPos);
         SetGameState(GameState.Dueling);
     }
 
@@ -166,7 +194,7 @@ public class GameManager : MonoBehaviour
             {
                 if (point.position.x > winnerPos.x) candidatePoints.Add(point);
             }
-            return candidatePoints.OrderBy(p => p.position.x).FirstOrDefault();
+            candidatePoints = candidatePoints.OrderBy(p => p.position.x).ToList();
         }
         else
         {
@@ -174,12 +202,16 @@ public class GameManager : MonoBehaviour
             {
                 if (point.position.x < winnerPos.x) candidatePoints.Add(point);
             }
-            return candidatePoints.OrderByDescending(p => p.position.x).FirstOrDefault();
+            candidatePoints = candidatePoints.OrderByDescending(p => p.position.x).ToList();
         }
+
+        if (candidatePoints.Count == 0) return null;
+        int targetIndex = Mathf.Min(spawnIndexOffset, candidatePoints.Count - 1);
+
+        return candidatePoints[targetIndex];
     }
     public void EndGame(string winnerTag)
     {
-        Debug.Log("JÁTÉK VÉGE! Gyõztes: " + winnerTag);
         Time.timeScale = 0f;
     }
 }

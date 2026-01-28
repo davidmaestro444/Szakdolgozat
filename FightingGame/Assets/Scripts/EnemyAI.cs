@@ -229,4 +229,15 @@ public class EnemyAI : MonoBehaviour
             attackHitbox.SetActive(false);
         }
     }
+
+    public void ResetState()
+    {
+        isDead = false;
+        knightControl.idle();
+        currentState = EnemyState.Idle;
+        rb.linearVelocity = Vector2.zero;
+        horizontalMovement = 0;
+        if (attackHitbox != null) attackHitbox.SetActive(false);
+        StopAllCoroutines();
+    }
 }
