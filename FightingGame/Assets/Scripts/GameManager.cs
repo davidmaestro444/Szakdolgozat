@@ -9,7 +9,13 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    private enum GameState { Dueling, PlayerAdvancing, EnemyAdvancing }
+    private enum GameState 
+    { 
+        Dueling, 
+        PlayerAdvancing, 
+        EnemyAdvancing 
+    }
+
     private GameState currentState;
     public GameObject playerPrefab;
     public GameObject opponentPrefab;
@@ -20,11 +26,11 @@ public class GameManager : MonoBehaviour
     public Transform playerInitialSpawn;
     public Transform opponentInitialSpawn;
     private List<Transform> spawnPoints = new List<Transform>();
-
     private GameObject playerInstance;
     private GameObject opponentInstance;
     public int spawnIndexOffset = 1;
     public TextMeshProUGUI countdownText;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(this); }
@@ -34,9 +40,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         GameObject[] spawnPointObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
-        foreach (var spo in spawnPointObjects)
+        foreach (var sp in spawnPointObjects)
         {
-            spawnPoints.Add(spo.transform);
+            spawnPoints.Add(sp.transform);
         }
         StartCoroutine(StartGameSequence());
     }
@@ -68,6 +74,7 @@ public class GameManager : MonoBehaviour
 
         cameraTarget.position = Vector3.Lerp(cameraTarget.position, targetPosition, Time.deltaTime * cameraMoveSpeed);
     }
+
     IEnumerator StartGameSequence()
     {
         CreateCharacters(playerInitialSpawn.position, opponentInitialSpawn.position);
@@ -87,8 +94,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         countdownText.gameObject.SetActive(false);
-        SetGameState(GameState.Dueling);
+        StartDuel();
     }
+
     void CreateCharacters(Vector3 playerPos, Vector3 opponentPos)
     {
         if (playerInstance == null)
@@ -103,16 +111,13 @@ public class GameManager : MonoBehaviour
 
         playerInstance.SetActive(true);
         opponentInstance.SetActive(true);
-
-        playerInstance.GetComponent<DamageBox>().ResetCharacter();
-        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
-
-        opponentInstance.GetComponent<EnemyAI>().player = playerInstance.transform;
     }
 
-    void StartNewRound(Vector3 playerPos, Vector3 opponentPos)
+    void StartDuel()
     {
-        CreateCharacters(playerPos, opponentPos);
+        playerInstance.GetComponent<DamageBox>().ResetCharacter();
+        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
+        opponentInstance.GetComponent<EnemyAI>().player = playerInstance.transform;
         SetGameState(GameState.Dueling);
     }
 
@@ -147,7 +152,6 @@ public class GameManager : MonoBehaviour
         if (character.CompareTag("Player"))
         {
             character.GetComponent<PlayerMovement>().enabled = false;
-
             SetGameState(GameState.EnemyAdvancing);
             StartCoroutine(Respawn(playerInstance, opponentInstance));
         }
@@ -163,22 +167,15 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(respawnDelay);
 
         loser.GetComponent<DamageBox>().ResetCharacter();
-
         Transform respawnPoint = FindBestSpawnPoint(winner);
-
         if (respawnPoint == null)
         {
             yield break;
         }
 
-        if (loser.CompareTag("Player"))
-        {
-            StartNewRound(respawnPoint.position, winner.transform.position);
-        }
-        else
-        {
-            StartNewRound(winner.transform.position, respawnPoint.position);
-        }
+        loser.transform.position = respawnPoint.position;
+        loser.SetActive(true);
+        StartDuel();
     }
 
     private Transform FindBestSpawnPoint(GameObject winner)
@@ -208,6 +205,7 @@ public class GameManager : MonoBehaviour
 
         return candidatePoints[targetIndex];
     }
+
     public void EndGame(string winnerTag)
     {
         Time.timeScale = 0f;
