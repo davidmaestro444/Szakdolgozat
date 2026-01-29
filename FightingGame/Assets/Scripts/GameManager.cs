@@ -168,8 +168,6 @@ public class GameManager : MonoBehaviour
 
         if (respawnPoint == null)
         {
-            Debug.LogError("Nem található megfelelõ spawn pont! Újraindítás...");
-            StartNewRound(playerInitialSpawn.position, opponentInitialSpawn.position);
             yield break;
         }
 

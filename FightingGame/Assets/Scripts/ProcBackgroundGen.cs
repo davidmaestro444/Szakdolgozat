@@ -29,10 +29,6 @@ public class ProcBackgroundGen : MonoBehaviour
         {
             backgroundQuadRenderer.material.mainTexture = texture;
         }
-        else
-        {
-            Debug.LogError("Nincs beállítva a Background Quad Renderer a szkriptben!");
-        }
     }
 
     private Texture2D GenerateTexture()
