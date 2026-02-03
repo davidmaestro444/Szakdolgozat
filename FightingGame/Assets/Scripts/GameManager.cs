@@ -78,10 +78,17 @@ public class GameManager : MonoBehaviour
     IEnumerator StartGameSequence()
     {
         CreateCharacters(playerInitialSpawn.position, opponentInitialSpawn.position);
+
         currentState = GameState.Dueling;
         cameraTarget.position = (playerInitialSpawn.position + opponentInitialSpawn.position) / 2;
         playerInstance.GetComponent<PlayerMovement>().enabled = false;
-        opponentInstance.GetComponent<EnemyAI>().DeactivateAI();
+
+        var ai = opponentInstance.GetComponent<EnemyAI>();
+        var p2Movement = opponentInstance.GetComponent<PlayerMovement>();
+
+        if (ai != null) ai.DeactivateAI();
+        if (p2Movement != null) p2Movement.enabled = false;
+
         countdownText.gameObject.SetActive(true);
         int count = 3;
         while (count > 0)
@@ -94,6 +101,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         countdownText.gameObject.SetActive(false);
+
         StartDuel();
     }
 
@@ -111,13 +119,27 @@ public class GameManager : MonoBehaviour
 
         playerInstance.SetActive(true);
         opponentInstance.SetActive(true);
+
+        playerInstance.GetComponent<DamageBox>().ResetCharacter();
+        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
+
+        var ai = opponentInstance.GetComponent<EnemyAI>();
+        if (ai != null)
+        {
+            ai.player = playerInstance.transform;
+        }
     }
 
     void StartDuel()
     {
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
-        opponentInstance.GetComponent<EnemyAI>().player = playerInstance.transform;
+
+        var ai = opponentInstance.GetComponent<EnemyAI>();
+        if (ai != null)
+        {
+            ai.player = playerInstance.transform;
+        }
         SetGameState(GameState.Dueling);
     }
 
@@ -127,22 +149,28 @@ public class GameManager : MonoBehaviour
         if (playerInstance == null || opponentInstance == null) return;
 
         var opponentAI = opponentInstance.GetComponent<EnemyAI>();
+        var opponentMovement = opponentInstance.GetComponent<PlayerMovement>();
         var playerMovement = playerInstance.GetComponent<PlayerMovement>();
 
         switch (currentState)
         {
             case GameState.Dueling:
                 playerMovement.enabled = true;
-                opponentAI.StartDueling(playerInstance.transform);
+                if (opponentAI != null) opponentAI.StartDueling(playerInstance.transform);
+
+                if (opponentMovement != null) opponentMovement.enabled = true;
                 break;
 
             case GameState.PlayerAdvancing:
-                opponentAI.DeactivateAI();
+                if (opponentAI != null) opponentAI.DeactivateAI();
+                if (opponentMovement != null) opponentMovement.enabled = false;
                 break;
 
             case GameState.EnemyAdvancing:
                 playerMovement.enabled = false;
-                opponentAI.StartAdvancing();
+                if (opponentAI != null) opponentAI.StartAdvancing();
+
+                if (opponentMovement != null) opponentMovement.enabled = true;
                 break;
         }
     }

@@ -4,34 +4,32 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private enum PlayerState
-    {
-        Idle,
-        Running,
-        Jumping,
-        Attacking
-    }
+    private enum PlayerState { Idle, Running, Jumping, Attacking }
+
+    public string horizontalAxis = "Horizontal";
+    public string jumpButton = "Vertical";
+    public KeyCode attackKey = KeyCode.Space;
 
     [SerializeField] private float groundspeed = 4f;
     [SerializeField] private float jumpForce = 7f;
     [SerializeField] private Rigidbody2D body;
     [SerializeField] private BoxCollider2D groundCheck;
     [SerializeField] private LayerMask groundMask;
-
     public GameObject attackHitbox;
     public float attackDuration = 0.3f;
     public KnightControl knightControl;
     public Transform knightVisuals;
+
     private bool grounded;
     private float xInput;
     private bool isFacingRight = true;
-
     private PlayerState currentState = PlayerState.Idle;
     private TrackEntry currentActionTrack;
 
     void Update()
     {
-        xInput = Input.GetAxis("Horizontal");
+        xInput = Input.GetAxis(horizontalAxis);
+
         CheckGround();
         UpdateState();
         FlipCharacter();
@@ -53,12 +51,12 @@ public class PlayerMovement : MonoBehaviour
             SetState(PlayerState.Idle);
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && currentState != PlayerState.Attacking && grounded)
+        if (Input.GetKeyDown(attackKey) && currentState != PlayerState.Attacking && grounded)
         {
             SetState(PlayerState.Attacking);
             StartCoroutine(AttackSequence());
         }
-        else if (Input.GetButtonDown("Vertical") && grounded)
+        else if (Input.GetButtonDown(jumpButton) && grounded)
         {
             body.linearVelocity = new Vector2(body.linearVelocity.x, 0);
             body.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
@@ -76,6 +74,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
+
     IEnumerator AttackSequence()
     {
         attackHitbox.SetActive(true);
@@ -85,25 +84,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void SetState(PlayerState newState)
     {
-        if (newState == currentState)
-            return;
-
+        if (newState == currentState) return;
         currentState = newState;
-
         switch (currentState)
         {
-            case PlayerState.Idle:
-                knightControl.idle();
-                break;
-            case PlayerState.Running:
-                knightControl.running();
-                break;
-            case PlayerState.Jumping:
-                currentActionTrack = knightControl.jump();
-                break;
-            case PlayerState.Attacking:
-                currentActionTrack = knightControl.attack_1();
-                break;
+            case PlayerState.Idle: knightControl.idle(); break;
+            case PlayerState.Running: knightControl.running(); break;
+            case PlayerState.Jumping: currentActionTrack = knightControl.jump(); break;
+            case PlayerState.Attacking: currentActionTrack = knightControl.attack_1(); break;
         }
     }
 
@@ -128,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
         knightControl.idle();
         currentState = PlayerState.Idle;
         body.linearVelocity = Vector2.zero;
-        attackHitbox.SetActive(false);
+        if (attackHitbox != null) attackHitbox.SetActive(false);
         StopAllCoroutines();
     }
 }
