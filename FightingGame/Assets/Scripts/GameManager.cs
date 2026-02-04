@@ -9,8 +9,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    private enum GameState 
-    { 
+    private enum GameState { 
         Dueling, 
         PlayerAdvancing, 
         EnemyAdvancing 
@@ -22,6 +21,8 @@ public class GameManager : MonoBehaviour
     public CinemachineCamera virtualCamera;
     public Transform cameraTarget;
     public float cameraMoveSpeed = 5f;
+    public Transform leftWall;
+    public Transform rightWall;
     public float respawnDelay = 3f;
     public Transform playerInitialSpawn;
     public Transform opponentInitialSpawn;
@@ -30,6 +31,8 @@ public class GameManager : MonoBehaviour
     private GameObject opponentInstance;
     public int spawnIndexOffset = 1;
     public TextMeshProUGUI countdownText;
+
+    private Vector3 lockedCameraPos;
 
     private void Awake()
     {
@@ -40,55 +43,62 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         GameObject[] spawnPointObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
-        foreach (var sp in spawnPointObjects)
-        {
-            spawnPoints.Add(sp.transform);
-        }
+        foreach (var sp in spawnPointObjects) { spawnPoints.Add(sp.transform); }
+        UpdateWallPositions();
+
         StartCoroutine(StartGameSequence());
     }
 
     void Update()
     {
-        if (playerInstance == null || opponentInstance == null)
-            return;
+        if (playerInstance == null || opponentInstance == null) return;
+
+        float camHeight = virtualCamera.Lens.OrthographicSize;
+        float camWidth = camHeight * Camera.main.aspect;
+        float margin = 1.5f;
 
         Vector3 targetPosition = cameraTarget.position;
 
         switch (currentState)
         {
             case GameState.Dueling:
-                if (playerInstance.activeSelf && opponentInstance.activeSelf)
-                {
-                    targetPosition.x = (playerInstance.transform.position.x + opponentInstance.transform.position.x) / 2;
-                }
+                targetPosition.x = lockedCameraPos.x;
                 break;
 
             case GameState.PlayerAdvancing:
-                targetPosition.x = Mathf.Max(targetPosition.x, playerInstance.transform.position.x);
+                float p1LeadingPos = playerInstance.transform.position.x + camWidth - margin;
+                targetPosition.x = Mathf.Max(targetPosition.x, p1LeadingPos);
                 break;
 
             case GameState.EnemyAdvancing:
-                targetPosition.x = Mathf.Min(targetPosition.x, opponentInstance.transform.position.x);
+                float enemyLeadingPos = opponentInstance.transform.position.x - camWidth + margin;
+                targetPosition.x = Mathf.Min(targetPosition.x, enemyLeadingPos);
                 break;
         }
-
         cameraTarget.position = Vector3.Lerp(cameraTarget.position, targetPosition, Time.deltaTime * cameraMoveSpeed);
+        UpdateWallPositions();
+    }
+
+    void UpdateWallPositions()
+    {
+        if (virtualCamera == null || leftWall == null || rightWall == null) return;
+
+        float camHeight = virtualCamera.Lens.OrthographicSize;
+        float camWidth = camHeight * Camera.main.aspect;
+        leftWall.localPosition = new Vector3(-camWidth, 0, 0);
+        rightWall.localPosition = new Vector3(camWidth, 0, 0);
     }
 
     IEnumerator StartGameSequence()
     {
         CreateCharacters(playerInitialSpawn.position, opponentInitialSpawn.position);
-
-        currentState = GameState.Dueling;
-        cameraTarget.position = (playerInitialSpawn.position + opponentInitialSpawn.position) / 2;
+        lockedCameraPos = (playerInitialSpawn.position + opponentInitialSpawn.position) / 2;
+        cameraTarget.position = lockedCameraPos;
         playerInstance.GetComponent<PlayerMovement>().enabled = false;
-
         var ai = opponentInstance.GetComponent<EnemyAI>();
         var p2Movement = opponentInstance.GetComponent<PlayerMovement>();
-
         if (ai != null) ai.DeactivateAI();
         if (p2Movement != null) p2Movement.enabled = false;
-
         countdownText.gameObject.SetActive(true);
         int count = 3;
         while (count > 0)
@@ -99,78 +109,54 @@ public class GameManager : MonoBehaviour
         }
         countdownText.text = "FIGHT!";
         yield return new WaitForSeconds(0.5f);
-
         countdownText.gameObject.SetActive(false);
-
         StartDuel();
-    }
-
-    void CreateCharacters(Vector3 playerPos, Vector3 opponentPos)
-    {
-        if (playerInstance == null)
-            playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
-        else
-            playerInstance.transform.position = playerPos;
-
-        if (opponentInstance == null)
-            opponentInstance = Instantiate(opponentPrefab, opponentPos, Quaternion.identity);
-        else
-            opponentInstance.transform.position = opponentPos;
-
-        playerInstance.SetActive(true);
-        opponentInstance.SetActive(true);
-
-        playerInstance.GetComponent<DamageBox>().ResetCharacter();
-        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
-
-        var ai = opponentInstance.GetComponent<EnemyAI>();
-        if (ai != null)
-        {
-            ai.player = playerInstance.transform;
-        }
     }
 
     void StartDuel()
     {
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
-
+        lockedCameraPos.x = (playerInstance.transform.position.x + opponentInstance.transform.position.x) / 2;
         var ai = opponentInstance.GetComponent<EnemyAI>();
-        if (ai != null)
-        {
-            ai.player = playerInstance.transform;
-        }
+        if (ai != null) ai.player = playerInstance.transform;
         SetGameState(GameState.Dueling);
+    }
+
+    void CreateCharacters(Vector3 playerPos, Vector3 opponentPos)
+    {
+        if (playerInstance == null) playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        else playerInstance.transform.position = playerPos;
+        if (opponentInstance == null) opponentInstance = Instantiate(opponentPrefab, opponentPos, Quaternion.identity);
+        else opponentInstance.transform.position = opponentPos;
+        playerInstance.SetActive(true);
+        opponentInstance.SetActive(true);
+        playerInstance.GetComponent<DamageBox>().ResetCharacter();
+        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
     }
 
     void SetGameState(GameState newState)
     {
         currentState = newState;
         if (playerInstance == null || opponentInstance == null) return;
-
         var opponentAI = opponentInstance.GetComponent<EnemyAI>();
-        var opponentMovement = opponentInstance.GetComponent<PlayerMovement>();
+        var p2Movement = opponentInstance.GetComponent<PlayerMovement>();
         var playerMovement = playerInstance.GetComponent<PlayerMovement>();
-
         switch (currentState)
         {
             case GameState.Dueling:
                 playerMovement.enabled = true;
                 if (opponentAI != null) opponentAI.StartDueling(playerInstance.transform);
-
-                if (opponentMovement != null) opponentMovement.enabled = true;
+                if (p2Movement != null) p2Movement.enabled = true;
                 break;
-
             case GameState.PlayerAdvancing:
                 if (opponentAI != null) opponentAI.DeactivateAI();
-                if (opponentMovement != null) opponentMovement.enabled = false;
+                if (p2Movement != null) p2Movement.enabled = false;
                 break;
-
             case GameState.EnemyAdvancing:
                 playerMovement.enabled = false;
                 if (opponentAI != null) opponentAI.StartAdvancing();
-
-                if (opponentMovement != null) opponentMovement.enabled = true;
+                if (p2Movement != null) p2Movement.enabled = true;
                 break;
         }
     }
@@ -193,14 +179,9 @@ public class GameManager : MonoBehaviour
     private IEnumerator Respawn(GameObject loser, GameObject winner)
     {
         yield return new WaitForSeconds(respawnDelay);
-
         loser.GetComponent<DamageBox>().ResetCharacter();
         Transform respawnPoint = FindBestSpawnPoint(winner);
-        if (respawnPoint == null)
-        {
-            yield break;
-        }
-
+        if (respawnPoint == null) yield break;
         loser.transform.position = respawnPoint.position;
         loser.SetActive(true);
         StartDuel();
@@ -210,32 +191,23 @@ public class GameManager : MonoBehaviour
     {
         Vector3 winnerPos = winner.transform.position;
         List<Transform> candidatePoints = new List<Transform>();
-
         if (winner.CompareTag("Player"))
         {
-            foreach (var point in spawnPoints)
-            {
-                if (point.position.x > winnerPos.x) candidatePoints.Add(point);
-            }
+            foreach (var point in spawnPoints) { if (point.position.x > winnerPos.x) candidatePoints.Add(point); }
             candidatePoints = candidatePoints.OrderBy(p => p.position.x).ToList();
         }
         else
         {
-            foreach (var point in spawnPoints)
-            {
-                if (point.position.x < winnerPos.x) candidatePoints.Add(point);
-            }
+            foreach (var point in spawnPoints) { if (point.position.x < winnerPos.x) candidatePoints.Add(point); }
             candidatePoints = candidatePoints.OrderByDescending(p => p.position.x).ToList();
         }
-
         if (candidatePoints.Count == 0) return null;
         int targetIndex = Mathf.Min(spawnIndexOffset, candidatePoints.Count - 1);
-
         return candidatePoints[targetIndex];
     }
 
-    public void EndGame(string winnerTag)
-    {
-        Time.timeScale = 0f;
+    public void EndGame(string winnerTag) 
+    { 
+        Time.timeScale = 0f; 
     }
 }
