@@ -1,4 +1,3 @@
-using Spine;
 using System.Collections;
 using UnityEngine;
 
@@ -27,7 +26,7 @@ public class EnemyAI : MonoBehaviour
     private float lastAttackTime;
     private bool isDead = false;
     private EnemyState currentState = EnemyState.Idle;
-    private TrackEntry currentActionTrack;
+    private KnightControl.DummyTrack currentActionTrack;
     private bool grounded;
     private float horizontalMovement = 0f;
     public GameObject attackHitbox;

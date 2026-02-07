@@ -1,10 +1,15 @@
-using Spine;
 using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private enum PlayerState { Idle, Running, Jumping, Attacking }
+    private enum PlayerState 
+    { 
+        Idle, 
+        Running, 
+        Jumping, 
+        Attacking 
+    }
 
     public string horizontalAxis = "Horizontal";
     public string jumpButton = "Vertical";
@@ -24,7 +29,6 @@ public class PlayerMovement : MonoBehaviour
     private float xInput;
     private bool isFacingRight = true;
     private PlayerState currentState = PlayerState.Idle;
-    private TrackEntry currentActionTrack;
 
     void Update()
     {
@@ -42,16 +46,25 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateState()
     {
-        if (currentState == PlayerState.Jumping && grounded)
+        if (currentState == PlayerState.Jumping)
         {
-            SetState(PlayerState.Idle);
-        }
-        else if (currentState == PlayerState.Attacking && currentActionTrack.IsComplete)
-        {
-            SetState(PlayerState.Idle);
+            if (grounded && body.linearVelocity.y <= 0.1f)
+            {
+                SetState(PlayerState.Idle);
+            }
+            return;
         }
 
-        if (Input.GetKeyDown(attackKey) && currentState != PlayerState.Attacking && grounded)
+        if (currentState == PlayerState.Attacking)
+        {
+            if (IsAnimationFinished())
+            {
+                SetState(PlayerState.Idle);
+            }
+            return;
+        }
+
+        if (Input.GetKeyDown(attackKey) && grounded)
         {
             SetState(PlayerState.Attacking);
             StartCoroutine(AttackSequence());
@@ -62,17 +75,27 @@ public class PlayerMovement : MonoBehaviour
             body.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             SetState(PlayerState.Jumping);
         }
-        else if (currentState == PlayerState.Idle || currentState == PlayerState.Running)
+        else if (grounded)
         {
             if (Mathf.Abs(xInput) > 0.1f)
-            {
                 SetState(PlayerState.Running);
-            }
             else
-            {
                 SetState(PlayerState.Idle);
-            }
         }
+    }
+
+    private bool IsAnimationFinished()
+    {
+        if (knightControl == null) return true;
+
+        Animator anim = knightControl.GetComponent<Animator>();
+        if (anim == null) anim = knightControl.GetComponentInChildren<Animator>();
+
+        if (anim != null)
+        {
+            return anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f && !anim.IsInTransition(0);
+        }
+        return true;
     }
 
     IEnumerator AttackSequence()
@@ -86,12 +109,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if (newState == currentState) return;
         currentState = newState;
+
         switch (currentState)
         {
             case PlayerState.Idle: knightControl.idle(); break;
             case PlayerState.Running: knightControl.running(); break;
-            case PlayerState.Jumping: currentActionTrack = knightControl.jump(); break;
-            case PlayerState.Attacking: currentActionTrack = knightControl.attack_1(); break;
+            case PlayerState.Jumping: knightControl.jump(); break;
+            case PlayerState.Attacking: knightControl.attack_1(); break;
         }
     }
 

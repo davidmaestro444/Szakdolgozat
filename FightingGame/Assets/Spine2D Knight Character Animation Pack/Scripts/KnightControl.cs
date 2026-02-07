@@ -5,112 +5,71 @@ using Spine.Unity;
 
 public class KnightControl : MonoBehaviour
 {
-    #region Inspector
-    // [SpineAnimation] attribute allows an Inspector dropdown of Spine animation names coming form SkeletonAnimation.
-    [SpineAnimation]
-    public string runAnimationName;
+    private Animator anim;
+    private WeaponManager weaponManager;
 
-    [SpineAnimation]
-    public string idleAnimationName;
+    public class DummyTrack 
+    { 
+        public bool IsComplete = true; 
+    }
+    private DummyTrack dummy = new DummyTrack();
 
-    [SpineAnimation]
-    public string walkAnimationName;
-
-    [SpineAnimation]
-    public string atkAnimationName_1;
-
-    [SpineAnimation]
-    public string atkAnimationName_2;
-
-    [SpineAnimation]
-    public string jumpAnimationName;
-
-    [SpineAnimation]
-    public string hitAnimationName;
-
-    [SpineAnimation]
-    public string deathAnimationName;
-
-    [SpineAnimation]
-    public string stunAnimationName;
-
-    [SpineAnimation]
-    public string skillAnimationName_1;
-    [SpineAnimation]
-    public string skillAnimationName_2;
-    [SpineAnimation]
-    public string skillAnimationName_3;
-
-    #endregion
-
-    SkeletonAnimation skeletonAnimation;
-
-    // Spine.AnimationState and Spine.Skeleton are not Unity-serialized objects. You will not see them as fields in the inspector.
-    public Spine.AnimationState spineAnimationState;
-    public Spine.Skeleton skeleton;
-    public float attackAnimationSpeed = 2f;
-
-
-    // Start is called before the first frame update
     void Awake()
     {
-        skeletonAnimation = GetComponent<SkeletonAnimation>();
-        if (skeletonAnimation != null)
+        anim = GetComponent<Animator>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
+
+        weaponManager = GetComponentInParent<WeaponManager>();
+        if (weaponManager == null) weaponManager = GetComponent<WeaponManager>();
+    }
+
+    public void idle()
+    {
+        if (anim == null) return;
+
+        bool actuallyHasWeapon = false;
+        if (weaponManager != null && weaponManager.handSocket != null)
         {
-            spineAnimationState = skeletonAnimation.AnimationState;
-            skeleton = skeletonAnimation.Skeleton;
+            actuallyHasWeapon = weaponManager.handSocket.childCount > 0;
+        }
+
+        if (actuallyHasWeapon)
+        {
+            anim.Play("char_sword_idle");
+        }
+        else
+        {
+            anim.Play("char_idle");
         }
     }
 
     public void running()
     {
-        spineAnimationState.SetAnimation(0, runAnimationName, true);
-    }
-    public void walking()
-    {
-        spineAnimationState.SetAnimation(0, walkAnimationName, true);
-    }
-    public void idle()
-    {
-        spineAnimationState.SetAnimation(0, idleAnimationName, true);
-    }
-    public Spine.TrackEntry jump()
-    {
-        return spineAnimationState.SetAnimation(0, jumpAnimationName, false);
-    }
-    public void getHit()
-    {
-        spineAnimationState.SetAnimation(0, hitAnimationName, true);
-    }
-    public Spine.TrackEntry death()
-    {
-        return spineAnimationState.SetAnimation(0, deathAnimationName, false);
-    }
-    public void stun()
-    {
-        spineAnimationState.SetAnimation(0, stunAnimationName, true);
-    }
-    public Spine.TrackEntry attack_1()
-    {
-        TrackEntry trackEntry = spineAnimationState.SetAnimation(0, atkAnimationName_1, false);
-        trackEntry.TimeScale = attackAnimationSpeed;
-        return trackEntry;
-    }
-    public void attack_2()
-    {
-        spineAnimationState.SetAnimation(0, atkAnimationName_2, true);
-    }
-    public void skill_1()
-    {
-        spineAnimationState.SetAnimation(0, skillAnimationName_1, true);
-    }
-    public void skill_2()
-    {
-        spineAnimationState.SetAnimation(0, skillAnimationName_2, true);
-    }
-    public void skill_3()
-    {
-        spineAnimationState.SetAnimation(0, skillAnimationName_3, true);
+        if (anim == null) return;
+        anim.Play("char_run");
     }
 
+    public DummyTrack attack_1()
+    {
+        if (weaponManager != null && weaponManager.currentWeapon != null)
+        {
+            if (weaponManager.currentWeapon.name.Contains("Sword"))
+                anim.Play("char_sword_attack");
+            else
+                anim.Play("char_bow_attack");
+        }
+        else
+        {
+            anim.Play("char_punch");
+        }
+        return dummy;
+    }
+
+    public DummyTrack jump() 
+    {
+        anim.Play("char_jump"); 
+        return dummy; 
+    }
+    public void death() {}
+    public void ResetState() => idle();
 }
