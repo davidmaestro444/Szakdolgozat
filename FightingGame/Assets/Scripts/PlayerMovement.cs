@@ -98,11 +98,22 @@ public class PlayerMovement : MonoBehaviour
         return true;
     }
 
-    IEnumerator AttackSequence()
+    /*IEnumerator AttackSequence()
     {
         attackHitbox.SetActive(true);
         yield return new WaitForSeconds(attackDuration);
         attackHitbox.SetActive(false);
+    }*/
+    IEnumerator AttackSequence()
+    {
+        Collider2D weaponCollider = attackHitbox.GetComponent<Collider2D>();
+
+        if (weaponCollider != null)
+        {
+            weaponCollider.enabled = true;
+            yield return new WaitForSeconds(attackDuration);
+            weaponCollider.enabled = false;
+        }
     }
 
     private void SetState(PlayerState newState)

@@ -5,6 +5,24 @@ public class WeaponManager : MonoBehaviour
     public Transform handSocket;
     public GameObject currentWeapon;
 
+    void Awake()
+    {
+        RefreshWeapon();
+    }
+
+    public void RefreshWeapon()
+    {
+        if (handSocket != null && handSocket.childCount > 0)
+        {
+            currentWeapon = handSocket.GetChild(0).gameObject;
+
+            if (currentWeapon.transform.parent == handSocket)
+            {
+                currentWeapon.SetActive(true);
+            }
+        }
+    }
+
     public void EquipWeapon(GameObject weaponPrefab)
     {
         if (currentWeapon != null) return;

@@ -219,13 +219,26 @@ public class EnemyAI : MonoBehaviour
         grounded = Physics2D.OverlapBox(boxCenter, new Vector2(bodyCollider.bounds.size.x * 0.9f, 0.1f), 0f, groundLayer);
     }
 
-    IEnumerator AttackSequence()
+    /*IEnumerator AttackSequence()
     {
         if (attackHitbox != null)
         {
             attackHitbox.SetActive(true);
             yield return new WaitForSeconds(attackDuration);
             attackHitbox.SetActive(false);
+        }
+    }*/
+    IEnumerator AttackSequence()
+    {
+        if (attackHitbox != null)
+        {
+            Collider2D weaponCollider = attackHitbox.GetComponent<Collider2D>();
+            if (weaponCollider != null)
+            {
+                weaponCollider.enabled = true;
+                yield return new WaitForSeconds(attackDuration);
+                weaponCollider.enabled = false;
+            }
         }
     }
 

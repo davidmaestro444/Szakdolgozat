@@ -25,16 +25,18 @@ public class KnightControl : MonoBehaviour
 
     public void idle()
     {
-        if (anim == null) return;
+        if (anim == null) anim = GetComponent<Animator>();
 
-        bool actuallyHasWeapon = false;
-        if (weaponManager != null && weaponManager.handSocket != null)
-        {
-            actuallyHasWeapon = weaponManager.handSocket.childCount > 0;
-        }
+        if (weaponManager == null) weaponManager = GetComponentInParent<WeaponManager>();
+        if (weaponManager == null) weaponManager = GetComponent<WeaponManager>();
+
+        if (weaponManager != null) weaponManager.RefreshWeapon();
+
+        bool actuallyHasWeapon = weaponManager != null && weaponManager.currentWeapon != null;
 
         if (actuallyHasWeapon)
         {
+            weaponManager.currentWeapon.SetActive(true);
             anim.Play("char_sword_idle");
         }
         else

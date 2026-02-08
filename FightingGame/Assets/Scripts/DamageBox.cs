@@ -17,39 +17,47 @@ public class DamageBox : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        bodyCollider.enabled = false;
-        rb.linearVelocity = Vector2.zero;
-        rb.bodyType = RigidbodyType2D.Kinematic;
-        var playerMovement = GetComponent<PlayerMovement>();
+        Debug.Log(gameObject.name + " eltalálva!");
 
-        if (playerMovement != null)
+        if (bodyCollider != null) bodyCollider.enabled = false;
+        if (rb != null)
         {
-            GetComponentInChildren<KnightControl>().death();
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Kinematic;
         }
 
-        var enemyAI = GetComponent<EnemyAI>();
-        if (enemyAI != null)
-        {
-            enemyAI.Die();
-        }
+        var knightControl = GetComponentInChildren<KnightControl>();
+        if (knightControl != null) knightControl.death();
+
         GameManager.Instance.OnCharacterDied(gameObject);
     }
 
     public void ResetCharacter()
     {
         isDead = false;
-        bodyCollider.enabled = true;
-        rb.bodyType = RigidbodyType2D.Dynamic;
-        var playerMovement = GetComponent<PlayerMovement>();
-        if (playerMovement != null)
+        if (bodyCollider != null) bodyCollider.enabled = true;
+        if (rb != null)
         {
-            playerMovement.ResetState();
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.linearVelocity = Vector2.zero;
         }
 
-        var enemyAI = GetComponent<EnemyAI>();
-        if (enemyAI != null)
+        WeaponManager wm = GetComponentInChildren<WeaponManager>();
+        if (wm != null)
         {
-            enemyAI.ResetState();
+            wm.RefreshWeapon();
         }
+
+        gameObject.SetActive(true);
+
+        var pm = GetComponent<PlayerMovement>();
+        if (pm != null)
+        {
+            pm.enabled = true;
+            pm.ResetState();
+        }
+
+        var ai = GetComponent<EnemyAI>();
+        if (ai != null) ai.ResetState();
     }
 }

@@ -131,6 +131,14 @@ public class GameManager : MonoBehaviour
         else opponentInstance.transform.position = opponentPos;
         playerInstance.SetActive(true);
         opponentInstance.SetActive(true);
+
+        var p1WM = playerInstance.GetComponentInChildren<WeaponManager>();
+        if (p1WM != null) p1WM.RefreshWeapon();
+
+        var p2WM = opponentInstance.GetComponentInChildren<WeaponManager>();
+        if (p2WM != null) p2WM.RefreshWeapon();
+        playerInstance.GetComponentInChildren<KnightControl>().idle();
+        opponentInstance.GetComponentInChildren<KnightControl>().idle();
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
     }
