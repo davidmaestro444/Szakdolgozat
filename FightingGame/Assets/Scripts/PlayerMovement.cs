@@ -30,6 +30,16 @@ public class PlayerMovement : MonoBehaviour
     private bool isFacingRight = true;
     private PlayerState currentState = PlayerState.Idle;
 
+    private WeaponManager weaponManager;
+    public float bowAttackDuration = 0.8f;
+    public float bowShootDelay = 0.4f;
+
+    void Awake()
+    {
+        body = GetComponent<Rigidbody2D>();
+        weaponManager = GetComponentInChildren<WeaponManager>();
+    }
+
     void Update()
     {
         xInput = Input.GetAxis(horizontalAxis);
@@ -41,7 +51,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        body.linearVelocity = new Vector2(xInput * groundspeed, body.linearVelocity.y);
+        if (currentState == PlayerState.Attacking)
+        {
+            body.linearVelocity = new Vector2(0, body.linearVelocity.y);
+        }
+        else
+        {
+            body.linearVelocity = new Vector2(xInput * groundspeed, body.linearVelocity.y);
+        }
     }
 
     private void UpdateState()
@@ -98,21 +115,33 @@ public class PlayerMovement : MonoBehaviour
         return true;
     }
 
-    /*IEnumerator AttackSequence()
-    {
-        attackHitbox.SetActive(true);
-        yield return new WaitForSeconds(attackDuration);
-        attackHitbox.SetActive(false);
-    }*/
     IEnumerator AttackSequence()
     {
-        Collider2D weaponCollider = attackHitbox.GetComponent<Collider2D>();
+        body.linearVelocity = new Vector2(0, body.linearVelocity.y);
 
-        if (weaponCollider != null)
+        if (weaponManager != null && weaponManager.HasBow())
         {
-            weaponCollider.enabled = true;
+            yield return new WaitForSeconds(bowShootDelay);
+
+            float dir = isFacingRight ? 1f : -1f;
+            weaponManager.ShootArrow(dir);
+
+            yield return new WaitForSeconds(bowAttackDuration - bowShootDelay);
+        }
+        else if (weaponManager != null && weaponManager.currentWeapon != null)
+        {
+            Collider2D weaponCollider = weaponManager.currentWeapon.GetComponent<Collider2D>();
+
+            if (weaponCollider != null)
+            {
+                weaponCollider.enabled = true;
+                yield return new WaitForSeconds(attackDuration);
+                weaponCollider.enabled = false;
+            }
+        }
+        else
+        {
             yield return new WaitForSeconds(attackDuration);
-            weaponCollider.enabled = false;
         }
     }
 

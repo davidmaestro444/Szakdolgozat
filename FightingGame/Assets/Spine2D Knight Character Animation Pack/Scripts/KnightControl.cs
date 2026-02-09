@@ -8,9 +8,9 @@ public class KnightControl : MonoBehaviour
     private Animator anim;
     private WeaponManager weaponManager;
 
-    public class DummyTrack 
-    { 
-        public bool IsComplete = true; 
+    public class DummyTrack
+    {
+        public bool IsComplete = true;
     }
     private DummyTrack dummy = new DummyTrack();
 
@@ -25,19 +25,23 @@ public class KnightControl : MonoBehaviour
 
     public void idle()
     {
-        if (anim == null) anim = GetComponent<Animator>();
+        if (anim == null) return;
+        if (weaponManager == null) return;
 
-        if (weaponManager == null) weaponManager = GetComponentInParent<WeaponManager>();
-        if (weaponManager == null) weaponManager = GetComponent<WeaponManager>();
+        weaponManager.RefreshWeapon();
 
-        if (weaponManager != null) weaponManager.RefreshWeapon();
-
-        bool actuallyHasWeapon = weaponManager != null && weaponManager.currentWeapon != null;
-
-        if (actuallyHasWeapon)
+        if (weaponManager.currentWeapon != null)
         {
-            weaponManager.currentWeapon.SetActive(true);
-            anim.Play("char_sword_idle");
+            string wName = weaponManager.currentWeapon.name.ToLower();
+
+            if (wName.Contains("sword") || wName.Contains("kard"))
+            {
+                anim.Play("char_sword_idle");
+            }
+            else
+            {
+                anim.Play("char_idle");
+            }
         }
         else
         {
@@ -55,7 +59,9 @@ public class KnightControl : MonoBehaviour
     {
         if (weaponManager != null && weaponManager.currentWeapon != null)
         {
-            if (weaponManager.currentWeapon.name.Contains("Sword"))
+            string wName = weaponManager.currentWeapon.name.ToLower();
+
+            if (wName.Contains("sword") || wName.Contains("kard"))
                 anim.Play("char_sword_attack");
             else
                 anim.Play("char_bow_attack");
@@ -67,11 +73,11 @@ public class KnightControl : MonoBehaviour
         return dummy;
     }
 
-    public DummyTrack jump() 
+    public DummyTrack jump()
     {
-        anim.Play("char_jump"); 
-        return dummy; 
+        anim.Play("char_jump");
+        return dummy;
     }
-    public void death() {}
+    public void death() { }
     public void ResetState() => idle();
 }

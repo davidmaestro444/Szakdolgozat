@@ -1042,7 +1042,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 367960814566989513, guid: df2d64e48eba88b4aa07fade1356b210,
     type: 3}
-  opponentPrefab: {fileID: 367960814566989513, guid: 9b1b9b32b7200a04cbe7aa9ee4e108b3,
+  opponentPrefab: {fileID: 367960814566989513, guid: e04e5e3c535a5a946ae7c33fee85d11e,
     type: 3}
   virtualCamera: {fileID: 776751962}
   cameraTarget: {fileID: 1593619218}

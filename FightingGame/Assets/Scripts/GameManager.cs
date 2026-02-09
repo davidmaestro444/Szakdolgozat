@@ -92,6 +92,8 @@ public class GameManager : MonoBehaviour
     IEnumerator StartGameSequence()
     {
         CreateCharacters(playerInitialSpawn.position, opponentInitialSpawn.position);
+        playerInstance.GetComponentInChildren<WeaponManager>().EquipWeaponByIndex(0);
+        opponentInstance.GetComponentInChildren<WeaponManager>().EquipWeaponByIndex(0);
         lockedCameraPos = (playerInitialSpawn.position + opponentInitialSpawn.position) / 2;
         cameraTarget.position = lockedCameraPos;
         playerInstance.GetComponent<PlayerMovement>().enabled = false;
@@ -117,6 +119,7 @@ public class GameManager : MonoBehaviour
     {
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
+
         lockedCameraPos.x = (playerInstance.transform.position.x + opponentInstance.transform.position.x) / 2;
         var ai = opponentInstance.GetComponent<EnemyAI>();
         if (ai != null) ai.player = playerInstance.transform;
@@ -125,20 +128,37 @@ public class GameManager : MonoBehaviour
 
     void CreateCharacters(Vector3 playerPos, Vector3 opponentPos)
     {
-        if (playerInstance == null) playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
-        else playerInstance.transform.position = playerPos;
-        if (opponentInstance == null) opponentInstance = Instantiate(opponentPrefab, opponentPos, Quaternion.identity);
-        else opponentInstance.transform.position = opponentPos;
-        playerInstance.SetActive(true);
-        opponentInstance.SetActive(true);
+        if (playerInstance == null)
+            playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        else
+        {
+            playerInstance.transform.position = playerPos;
+            playerInstance.SetActive(true);
+        }
+
+        if (opponentInstance == null)
+            opponentInstance = Instantiate(opponentPrefab, opponentPos, Quaternion.identity);
+        else
+        {
+            opponentInstance.transform.position = opponentPos;
+            opponentInstance.SetActive(true);
+        }
 
         var p1WM = playerInstance.GetComponentInChildren<WeaponManager>();
-        if (p1WM != null) p1WM.RefreshWeapon();
+        if (p1WM != null)
+        {
+            p1WM.EquipWeaponByIndex(0);
+        }
 
         var p2WM = opponentInstance.GetComponentInChildren<WeaponManager>();
-        if (p2WM != null) p2WM.RefreshWeapon();
+        if (p2WM != null)
+        {
+            p2WM.EquipWeaponByIndex(0);
+        }
+
         playerInstance.GetComponentInChildren<KnightControl>().idle();
         opponentInstance.GetComponentInChildren<KnightControl>().idle();
+
         playerInstance.GetComponent<DamageBox>().ResetCharacter();
         opponentInstance.GetComponent<DamageBox>().ResetCharacter();
     }
@@ -187,7 +207,12 @@ public class GameManager : MonoBehaviour
     private IEnumerator Respawn(GameObject loser, GameObject winner)
     {
         yield return new WaitForSeconds(respawnDelay);
+
+        var wm = loser.GetComponentInChildren<WeaponManager>();
+        if (wm != null) wm.SwitchToNextWeapon();
+
         loser.GetComponent<DamageBox>().ResetCharacter();
+
         Transform respawnPoint = FindBestSpawnPoint(winner);
         if (respawnPoint == null) yield break;
         loser.transform.position = respawnPoint.position;

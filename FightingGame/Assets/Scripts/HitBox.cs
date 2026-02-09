@@ -2,28 +2,19 @@ using UnityEngine;
 
 public class HitBox : MonoBehaviour
 {
-    /*private void OnTriggerEnter2D(Collider2D other)
-    {
-        DamageBox damagebox = other.GetComponent<DamageBox>();
-        if (damagebox != null)
-        {
-            damagebox.GetHit();
-            gameObject.SetActive(false);
-        }
-    }*/
     private void OnTriggerEnter2D(Collider2D other)
     {
-        DamageBox damagebox = other.GetComponentInParent<DamageBox>();
+        DamageBox targetDamageBox = other.GetComponentInParent<DamageBox>();
 
-        if (damagebox != null)
+        if (targetDamageBox != null)
         {
             if (transform.root == other.transform.root)
             {
                 return;
             }
-
-            damagebox.GetHit();
-            GetComponent<Collider2D>().enabled = false;
+            targetDamageBox.GetHit();
+            Collider2D col = GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
         }
     }
 }

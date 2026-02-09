@@ -17,8 +17,6 @@ public class DamageBox : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        Debug.Log(gameObject.name + " eltalálva!");
-
         if (bodyCollider != null) bodyCollider.enabled = false;
         if (rb != null)
         {
@@ -49,7 +47,6 @@ public class DamageBox : MonoBehaviour
         }
 
         gameObject.SetActive(true);
-
         var pm = GetComponent<PlayerMovement>();
         if (pm != null)
         {
