@@ -26,27 +26,18 @@ public class KnightControl : MonoBehaviour
     public void idle()
     {
         if (anim == null) return;
-        if (weaponManager == null) return;
 
-        weaponManager.RefreshWeapon();
-
-        if (weaponManager.currentWeapon != null)
-        {
-            string wName = weaponManager.currentWeapon.name.ToLower();
-
-            if (wName.Contains("sword") || wName.Contains("kard"))
-            {
-                anim.Play("char_sword_idle");
-            }
-            else
-            {
-                anim.Play("char_idle");
-            }
-        }
-        else
+        if (weaponManager == null || weaponManager.currentWeapon == null)
         {
             anim.Play("char_idle");
+            return;
         }
+
+        string wName = weaponManager.currentWeapon.name.ToLower();
+        if (wName.Contains("sword") || wName.Contains("kard"))
+            anim.Play("char_sword_idle");
+        else
+            anim.Play("char_idle");
     }
 
     public void running()
@@ -79,5 +70,10 @@ public class KnightControl : MonoBehaviour
         return dummy;
     }
     public void death() { }
+
+    public void sword_throw()
+    {
+        if (anim != null) anim.Play("char_sword_throw");
+    }
     public void ResetState() => idle();
 }

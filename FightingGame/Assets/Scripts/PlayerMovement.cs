@@ -34,6 +34,9 @@ public class PlayerMovement : MonoBehaviour
     public float bowAttackDuration = 0.8f;
     public float bowShootDelay = 0.4f;
 
+    public KeyCode throwKey = KeyCode.Q;
+    public KeyCode interactKey = KeyCode.F;
+
     void Awake()
     {
         body = GetComponent<Rigidbody2D>();
@@ -43,12 +46,37 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         xInput = Input.GetAxis(horizontalAxis);
-
         CheckGround();
+
+        if (Input.GetKeyDown(throwKey) && weaponManager.HasWeapon())
+        {
+            StartCoroutine(ThrowSequence());
+        }
+
+        if (Input.GetKeyDown(interactKey))
+        {
+            if (weaponManager.TryPickUpWeapon())
+            {
+                knightControl.idle();
+            }
+        }
+
         UpdateState();
         FlipCharacter();
     }
+    IEnumerator ThrowSequence()
+    {
+        SetState(PlayerState.Attacking);
+        knightControl.sword_throw();
+        yield return new WaitForSeconds(0.15f);
 
+        float dir = isFacingRight ? 1f : -1f;
+        weaponManager.ThrowCurrentWeapon(dir);
+        yield return new WaitForSeconds(0.2f);
+
+        SetState(PlayerState.Idle);
+        knightControl.idle();
+    }
     private void FixedUpdate()
     {
         if (currentState == PlayerState.Attacking)
@@ -122,16 +150,13 @@ public class PlayerMovement : MonoBehaviour
         if (weaponManager != null && weaponManager.HasBow())
         {
             yield return new WaitForSeconds(bowShootDelay);
-
             float dir = isFacingRight ? 1f : -1f;
             weaponManager.ShootArrow(dir);
-
             yield return new WaitForSeconds(bowAttackDuration - bowShootDelay);
         }
         else if (weaponManager != null && weaponManager.currentWeapon != null)
         {
             Collider2D weaponCollider = weaponManager.currentWeapon.GetComponent<Collider2D>();
-
             if (weaponCollider != null)
             {
                 weaponCollider.enabled = true;
@@ -141,8 +166,18 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(attackDuration);
+            if (attackHitbox != null)
+            {
+                attackHitbox.SetActive(true);
+                yield return new WaitForSeconds(attackDuration);
+                attackHitbox.SetActive(false);
+            }
+            else
+            {
+                yield return new WaitForSeconds(attackDuration);
+            }
         }
+        SetState(PlayerState.Idle);
     }
 
     private void SetState(PlayerState newState)

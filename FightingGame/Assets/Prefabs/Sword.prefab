@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 7108649884563509804}
   - component: {fileID: 1266585338839953861}
   - component: {fileID: 8812707720483667309}
+  - component: {fileID: -6674855460651396608}
   m_Layer: 11
   m_Name: Sword
-  m_TagString: Untagged
+  m_TagString: Sword
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -127,7 +128,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0
 --- !u!61 &8812707720483667309
 BoxCollider2D:
@@ -175,3 +176,15 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.1, y: 6.7699995}
   m_EdgeRadius: 0
+--- !u!114 &-6674855460651396608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8929127329815423100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c07fd2551b515b47922e197274b4198, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

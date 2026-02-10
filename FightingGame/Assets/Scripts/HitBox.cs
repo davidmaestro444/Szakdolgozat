@@ -2,19 +2,66 @@ using UnityEngine;
 
 public class HitBox : MonoBehaviour
 {
+    public string ownerTag;
+    private bool isLethal = true;
+    private Rigidbody2D rb;
+    private Collider2D col;
+
+    void Awake()
+    {
+        rb = GetComponentInParent<Rigidbody2D>();
+        col = GetComponent<Collider2D>();
+    }
+
+    public void PrepareForThrow(string tagOfThrower)
+    {
+        ownerTag = tagOfThrower;
+        isLethal = true;
+
+        if (col != null)
+        {
+            col.enabled = true;
+            col.isTrigger = true;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        DamageBox targetDamageBox = other.GetComponentInParent<DamageBox>();
-
-        if (targetDamageBox != null)
+        if (transform.parent != null)
         {
-            if (transform.root == other.transform.root)
+            DamageBox target = other.GetComponentInParent<DamageBox>();
+            if (target != null && transform.root != other.transform.root)
             {
-                return;
+                target.GetHit();
             }
-            targetDamageBox.GetHit();
-            Collider2D col = GetComponent<Collider2D>();
-            if (col != null) col.enabled = false;
+            return;
         }
+
+        if (!isLethal) return;
+        if (other.CompareTag(ownerTag)) return;
+
+        DamageBox thrownTarget = other.GetComponentInParent<DamageBox>();
+
+        if (thrownTarget != null)
+        {
+            thrownTarget.GetHit();
+            isLethal = false;
+        }
+        else if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            StopWeaponOnGround();
+        }
+    }
+
+    private void StopWeaponOnGround()
+    {
+        isLethal = false;
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0;
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+        if (col != null) col.isTrigger = true;
     }
 }
