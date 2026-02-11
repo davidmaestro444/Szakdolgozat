@@ -83,7 +83,7 @@ MonoBehaviour:
   jumpButton: Vertical2
   attackKey: 257
   groundspeed: 6
-  jumpForce: 11
+  jumpForce: 14
   body: {fileID: 7451562961646730810}
   groundCheck: {fileID: 7458100424064135253}
   groundMask:
