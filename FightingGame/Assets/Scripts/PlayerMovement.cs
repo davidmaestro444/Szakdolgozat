@@ -25,7 +25,7 @@ public class PlayerMovement : MonoBehaviour
     public KnightControl knightControl;
     public Transform knightVisuals;
 
-    private bool grounded;
+    public bool grounded;
     private float xInput;
     private bool isFacingRight = true;
     private PlayerState currentState = PlayerState.Idle;
@@ -36,6 +36,7 @@ public class PlayerMovement : MonoBehaviour
 
     public KeyCode throwKey = KeyCode.Q;
     public KeyCode interactKey = KeyCode.F;
+    private bool isUncontrollable = false;
 
     void Awake()
     {
@@ -79,6 +80,8 @@ public class PlayerMovement : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        if (isUncontrollable) return;
+
         if (currentState == PlayerState.Attacking)
         {
             body.linearVelocity = new Vector2(0, body.linearVelocity.y);
@@ -208,6 +211,25 @@ public class PlayerMovement : MonoBehaviour
     void CheckGround()
     {
         grounded = Physics2D.OverlapAreaAll(groundCheck.bounds.min, groundCheck.bounds.max, groundMask).Length > 0;
+    }
+
+    public void ApplyKnockback(Vector2 force, float duration)
+    {
+        StartCoroutine(KnockbackRoutine(force, duration));
+    }
+
+    IEnumerator KnockbackRoutine(Vector2 force, float duration)
+    {
+        isUncontrollable = true;
+        float originalGravity = body.gravityScale;
+        body.gravityScale = 10f;
+        body.linearVelocity = Vector2.zero;
+        body.AddForce(force, ForceMode2D.Impulse);
+
+        yield return new WaitForSeconds(duration);
+
+        body.gravityScale = originalGravity;
+        isUncontrollable = false;
     }
 
     public void ResetState()

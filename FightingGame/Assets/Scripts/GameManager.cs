@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -34,6 +35,9 @@ public class GameManager : MonoBehaviour
     private GameObject playerInstance;
     private GameObject opponentInstance;
     private Vector3 lockedDuelPos;
+    [Header("Victory Screen")]
+    public GameObject victoryPanel;
+    public TextMeshProUGUI winnerText;
 
     private void Awake()
     {
@@ -234,8 +238,35 @@ public class GameManager : MonoBehaviour
         return candidatePoints[targetIndex];
     }
 
-    public void EndGame(string winnerTag) 
-    { 
-        Time.timeScale = 0f; 
+    public void EndGame(string winnerTag)
+    {
+        Time.timeScale = 0f;
+
+        if (victoryPanel != null)
+        {
+            victoryPanel.SetActive(true);
+
+            if (winnerTag == "Player" || winnerTag == "Player1")
+            {
+                winnerText.text = "PLAYER 1 WINS!";
+                winnerText.color = Color.cyan;
+            }
+            else
+            {
+                winnerText.text = "PLAYER 2 WINS!";
+                winnerText.color = Color.red;
+            }
+        }
+    }
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void LoadMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
     }
 }

@@ -93,6 +93,7 @@ MonoBehaviour:
   attackDuration: 0.3
   knightControl: {fileID: 6839012024030873805}
   knightVisuals: {fileID: 6026700438554617569}
+  grounded: 0
   bowAttackDuration: 0.8
   bowShootDelay: 0.4
   throwKey: 259
@@ -433,6 +434,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 669fd8fd448d7f847ba00f62f5146a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ownerTag: 
 --- !u!1 &7621244527319843485
 GameObject:
   m_ObjectHideFlags: 0
@@ -611,6 +613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 669fd8fd448d7f847ba00f62f5146a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ownerTag: 
 --- !u!1 &8049241145237901174
 GameObject:
   m_ObjectHideFlags: 0
