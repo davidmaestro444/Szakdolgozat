@@ -18,6 +18,7 @@ public class DamageBox : MonoBehaviour
         isDead = true;
 
         if (bodyCollider != null) bodyCollider.enabled = false;
+
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -33,6 +34,13 @@ public class DamageBox : MonoBehaviour
     public void ResetCharacter()
     {
         isDead = false;
+        gameObject.SetActive(true);
+        Animator anim = GetComponentInChildren<Animator>();
+        if (anim != null)
+        {
+            anim.Rebind();
+        }
+
         if (bodyCollider != null) bodyCollider.enabled = true;
         if (rb != null)
         {
@@ -46,7 +54,6 @@ public class DamageBox : MonoBehaviour
             wm.RefreshWeapon();
         }
 
-        gameObject.SetActive(true);
         var pm = GetComponent<PlayerMovement>();
         if (pm != null)
         {

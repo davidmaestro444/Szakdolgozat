@@ -201,8 +201,12 @@ public class GameManager : MonoBehaviour
     {
         yield return new WaitForSeconds(respawnDelay);
 
+        loser.SetActive(false);
+
         var wm = loser.GetComponentInChildren<WeaponManager>();
         if (wm != null) wm.SwitchToNextWeapon();
+
+        loser.GetComponent<DamageBox>().ResetCharacter();
 
         Transform respawnPoint = FindBestSpawnPoint(winner);
         if (respawnPoint != null)

@@ -69,7 +69,15 @@ public class KnightControl : MonoBehaviour
         anim.Play("char_jump");
         return dummy;
     }
-    public void death() { }
+    public void death()
+    {
+        if (anim != null) anim.Play("char_death");
+
+        if (weaponManager != null && weaponManager.currentWeapon != null)
+        {
+            weaponManager.currentWeapon.SetActive(false);
+        }
+    }
 
     public void sword_throw()
     {
