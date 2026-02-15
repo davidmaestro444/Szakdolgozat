@@ -62,26 +62,18 @@ public class WeaponManager : MonoBehaviour
 
     public void ThrowCurrentWeapon(float direction)
     {
-        if (currentWeapon == null) return;
+        if (currentWeapon == null || HasBow()) return;
 
-        if (HasBow())
-        {
-            Debug.Log("Az íjat nem lehet eldobni!");
-            return;
-        }
         GameObject thrown = currentWeapon;
         currentWeapon = null;
-
         thrown.tag = transform.root.tag;
         thrown.transform.SetParent(null);
 
-        thrown.transform.position += new Vector3(direction * 1.2f, 0.5f, 0);
+        float offsetDistance = thrown.name.Contains("Spear") ? 1.8f : 1.2f;
+        thrown.transform.position += new Vector3(direction * offsetDistance, 0.5f, 0);
 
         HitBox hb = thrown.GetComponentInChildren<HitBox>();
-        if (hb != null)
-        {
-            hb.PrepareForThrow(transform.root.tag);
-        }
+        if (hb != null) hb.PrepareForThrow(transform.root.tag);
 
         Rigidbody2D rb = thrown.GetComponent<Rigidbody2D>();
         if (rb != null)
@@ -89,9 +81,18 @@ public class WeaponManager : MonoBehaviour
             rb.simulated = true;
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0;
+            rb.AddForce(new Vector2(direction * 12f, 4f), ForceMode2D.Impulse);
 
-            rb.AddForce(new Vector2(direction * 10f, 3f), ForceMode2D.Impulse);
-            rb.AddTorque(-direction * 15f, ForceMode2D.Impulse);
+            if (!thrown.name.Contains("Spear"))
+            {
+                rb.AddTorque(-direction * 15f, ForceMode2D.Impulse);
+            }
+            else
+            {
+                float angle = (direction > 0) ? -90f : 90f;
+                thrown.transform.rotation = Quaternion.Euler(0, 0, angle);
+            }
         }
     }
 

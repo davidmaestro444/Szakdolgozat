@@ -67,17 +67,27 @@ public class PlayerMovement : MonoBehaviour
     }
     IEnumerator ThrowSequence()
     {
+        if (weaponManager.currentWeapon == null) yield break;
+
         SetState(PlayerState.Attacking);
-        knightControl.sword_throw();
+
+        string wName = weaponManager.currentWeapon.name.ToLower();
+        if (wName.Contains("spear"))
+            knightControl.spear_throw();
+        else
+            knightControl.sword_throw();
+
         yield return new WaitForSeconds(0.15f);
 
         float dir = isFacingRight ? 1f : -1f;
         weaponManager.ThrowCurrentWeapon(dir);
+
         yield return new WaitForSeconds(0.2f);
 
         SetState(PlayerState.Idle);
         knightControl.idle();
     }
+
     private void FixedUpdate()
     {
         if (isUncontrollable) return;

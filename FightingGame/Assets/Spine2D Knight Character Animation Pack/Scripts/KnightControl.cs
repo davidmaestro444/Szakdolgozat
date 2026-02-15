@@ -87,5 +87,11 @@ public class KnightControl : MonoBehaviour
     {
         if (anim != null) anim.Play("char_sword_throw");
     }
+
+    public void spear_throw()
+    {
+        if (anim != null) anim.Play("char_spear_throw");
+    }
+
     public void ResetState() => idle();
 }
