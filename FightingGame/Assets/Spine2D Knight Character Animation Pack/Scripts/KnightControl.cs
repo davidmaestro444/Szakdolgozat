@@ -36,6 +36,8 @@ public class KnightControl : MonoBehaviour
         string wName = weaponManager.currentWeapon.name.ToLower();
         if (wName.Contains("sword") || wName.Contains("kard"))
             anim.Play("char_sword_idle");
+        else if (wName.Contains("spear") || wName.Contains("landzsa"))
+            anim.Play("char_spear_idle");
         else
             anim.Play("char_idle");
     }
@@ -54,7 +56,9 @@ public class KnightControl : MonoBehaviour
 
             if (wName.Contains("sword") || wName.Contains("kard"))
                 anim.Play("char_sword_attack");
-            else
+            else if (wName.Contains("spear") || wName.Contains("landzsa"))
+                anim.Play("char_spear_attack");
+            else if (wName.Contains("bow"))
                 anim.Play("char_bow_attack");
         }
         else

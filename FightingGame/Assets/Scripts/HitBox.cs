@@ -38,10 +38,13 @@ public class HitBox : MonoBehaviour
         }
 
         if (!isLethal) return;
-        if (other.CompareTag(ownerTag)) return;
+
+        if (!string.IsNullOrEmpty(ownerTag))
+        {
+            if (other.CompareTag(ownerTag)) return;
+        }
 
         DamageBox thrownTarget = other.GetComponentInParent<DamageBox>();
-
         if (thrownTarget != null)
         {
             thrownTarget.GetHit();
