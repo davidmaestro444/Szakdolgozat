@@ -10,6 +10,9 @@ public class DamageBox : MonoBehaviour
     public bool hasShield = false;
     public GameObject shieldVisual;
 
+    private float hitCooldown = 0.15f;
+    private float lastHitTimestamp;
+
     void Awake()
     {
         bodyCollider = GetComponentInChildren<Collider2D>();
@@ -19,11 +22,12 @@ public class DamageBox : MonoBehaviour
 
     public void GetHit()
     {
+        if (Time.time < lastHitTimestamp + hitCooldown) return;
+        lastHitTimestamp = Time.time;
+
         if (hasShield)
         {
-            hasShield = false;
-            if (shieldVisual != null) shieldVisual.SetActive(false);
-            Debug.Log(gameObject.name + " pajzsa összetört!");
+            DisableShield();
             return;
         }
 
@@ -45,25 +49,38 @@ public class DamageBox : MonoBehaviour
 
     public void ResetCharacter()
     {
-        isDead = false;
-        hasShield = false;
-        if (shieldVisual != null) shieldVisual.SetActive(false);
-
+        if (isDead)
+        {
+            isDead = false;
+            hasShield = false;
+            if (shieldVisual != null) shieldVisual.SetActive(false);
+        }
         gameObject.SetActive(true);
         Animator anim = GetComponentInChildren<Animator>();
         if (anim != null) anim.Rebind();
-
         if (bodyCollider != null) bodyCollider.enabled = true;
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.linearVelocity = Vector2.zero;
         }
-
         WeaponManager wm = GetComponentInChildren<WeaponManager>();
         if (wm != null) wm.RefreshWeapon();
-
         var pm = GetComponent<PlayerMovement>();
         if (pm != null) { pm.enabled = true; pm.ResetState(); }
+        var ai = GetComponent<EnemyAI>();
+        if (ai != null) ai.ResetState();
+    }
+
+    public void EnableShield()
+    {
+        hasShield = true;
+        if (shieldVisual != null) shieldVisual.SetActive(true);
+    }
+
+    public void DisableShield()
+    {
+        hasShield = false;
+        if (shieldVisual != null) shieldVisual.SetActive(false);
     }
 }

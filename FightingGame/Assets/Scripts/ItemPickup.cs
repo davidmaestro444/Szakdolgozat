@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
@@ -5,37 +6,66 @@ public class ItemPickup : MonoBehaviour
     public enum ItemType { Spear, Shield }
     public ItemType type;
 
-    private void OnTriggerStay2D(Collider2D other)
+    private List<PlayerMovement> playersInRange = new List<PlayerMovement>();
+    private Rigidbody2D rb;
+
+    void Awake()
     {
-        PlayerMovement pm = other.GetComponentInParent<PlayerMovement>();
+        rb = GetComponent<Rigidbody2D>();
+    }
 
-        if (pm == null) return;
-
-        if (Input.GetKeyDown(pm.interactKey))
+    private void Update()
+    {
+        for (int i = playersInRange.Count - 1; i >= 0; i--)
         {
-            if (type == ItemType.Shield)
+            PlayerMovement pm = playersInRange[i];
+            if (pm != null && Input.GetKeyDown(pm.interactKey))
             {
-                DamageBox db = pm.GetComponent<DamageBox>();
-                if (db != null)
+                if (type == ItemType.Shield)
                 {
-                    db.hasShield = true;
-                    if (db.shieldVisual != null) db.shieldVisual.SetActive(true);
-                    Destroy(gameObject);
-                    Debug.Log("Pajzs felvéve!");
-                }
-            }
-            else if (type == ItemType.Spear)
-            {
-                WeaponManager wm = pm.GetComponentInChildren<WeaponManager>();
-
-                if (wm != null)
-                {
-                    if (wm.TryPickUpWeapon())
+                    DamageBox db = pm.GetComponent<DamageBox>();
+                    if (db != null)
                     {
-                        Debug.Log("Lándzsa felvéve!");
+                        db.EnableShield();
+                        Destroy(gameObject);
+                    }
+                }
+                else if (type == ItemType.Spear)
+                {
+                    WeaponManager wm = pm.GetComponentInChildren<WeaponManager>();
+                    if (wm != null && wm.TryPickUpWeapon())
+                    {
+                        playersInRange.Remove(pm);
                     }
                 }
             }
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
+        {
+            if (transform.parent == null && rb != null && rb.bodyType != RigidbodyType2D.Static)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.bodyType = RigidbodyType2D.Static;
+            }
+        }
+
+        PlayerMovement pm = other.GetComponentInParent<PlayerMovement>();
+        if (pm != null && !playersInRange.Contains(pm))
+        {
+            playersInRange.Add(pm);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        PlayerMovement pm = other.GetComponentInParent<PlayerMovement>();
+        if (pm != null && playersInRange.Contains(pm))
+        {
+            playersInRange.Remove(pm);
         }
     }
 }

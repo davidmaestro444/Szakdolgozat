@@ -100,16 +100,19 @@ public class WeaponManager : MonoBehaviour
     {
         if (currentWeapon != null) return false;
 
-        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
         foreach (var hit in hitColliders)
         {
-            if ((hit.CompareTag("Sword") || hit.CompareTag("Spear")) && hit.transform.parent == null)
+            bool isSword = hit.name.Contains("Sword") || hit.CompareTag("Sword");
+            bool isSpear = hit.name.Contains("Spear") || hit.CompareTag("Spear");
+
+            if ((isSword || isSpear) && hit.transform.parent == null)
             {
                 currentWeapon = hit.gameObject;
                 currentWeapon.transform.SetParent(handSocket);
 
-                if (hit.CompareTag("Spear")) currentWeapon.name = "Spear";
-                else if (hit.CompareTag("Sword")) currentWeapon.name = "Sword";
+                if (isSpear) currentWeapon.name = "Spear";
+                else currentWeapon.name = "Sword";
 
                 Rigidbody2D rb = currentWeapon.GetComponent<Rigidbody2D>();
                 if (rb != null)

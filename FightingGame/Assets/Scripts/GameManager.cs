@@ -132,8 +132,6 @@ public class GameManager : MonoBehaviour
     {
         float midX = (playerInstance.transform.position.x + opponentInstance.transform.position.x) / 2f;
         lockedDuelPos = new Vector3(midX, cameraTarget.position.y, 0);
-        playerInstance.GetComponent<DamageBox>().ResetCharacter();
-        opponentInstance.GetComponent<DamageBox>().ResetCharacter();
 
         var ai = opponentInstance.GetComponent<EnemyAI>();
         if (ai != null) ai.player = playerInstance.transform;

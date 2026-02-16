@@ -17,7 +17,6 @@ public class HitBox : MonoBehaviour
     {
         ownerTag = tagOfThrower;
         isLethal = true;
-
         if (col != null)
         {
             col.enabled = true;
@@ -33,22 +32,20 @@ public class HitBox : MonoBehaviour
             if (target != null && transform.root != other.transform.root)
             {
                 target.GetHit();
+                if (col != null) col.enabled = false;
             }
             return;
         }
 
         if (!isLethal) return;
-
-        if (!string.IsNullOrEmpty(ownerTag))
-        {
-            if (other.CompareTag(ownerTag)) return;
-        }
+        if (!string.IsNullOrEmpty(ownerTag) && other.CompareTag(ownerTag)) return;
 
         DamageBox thrownTarget = other.GetComponentInParent<DamageBox>();
+
         if (thrownTarget != null)
         {
             thrownTarget.GetHit();
-            isLethal = false;
+            Destroy(gameObject);
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {

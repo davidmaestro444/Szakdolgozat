@@ -27,6 +27,7 @@ public class ItemSpawner : MonoBehaviour
             int randItem = Random.Range(0, itemPrefabs.Length);
             int randPoint = Random.Range(0, spawnPoints.Length);
             currentItem = Instantiate(itemPrefabs[randItem], spawnPoints[randPoint].position, Quaternion.identity);
+            currentItem.SetActive(true);
         }
     }
 }
