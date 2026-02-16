@@ -35,9 +35,14 @@ public class GameManager : MonoBehaviour
     private GameObject playerInstance;
     private GameObject opponentInstance;
     private Vector3 lockedDuelPos;
+
     [Header("Victory Screen")]
     public GameObject victoryPanel;
     public TextMeshProUGUI winnerText;
+
+    [Header("Direction Arrows")]
+    public GameObject p1Arrow;
+    public GameObject p2Arrow;
 
     private void Awake()
     {
@@ -49,7 +54,13 @@ public class GameManager : MonoBehaviour
     {
         GameObject[] spawnPointObjects = GameObject.FindGameObjectsWithTag("SpawnPoint");
         foreach (var sp in spawnPointObjects) { spawnPoints.Add(sp.transform); }
-
+        ProgressBar pb = FindFirstObjectByType<ProgressBar>();
+        if (pb != null)
+        {
+            pb.cameraTarget = this.cameraTarget;
+            pb.leftLimit = GameObject.Find("OpponentGoal").transform;
+            pb.rightLimit = GameObject.Find("PlayerGoal").transform;
+        }
         StartCoroutine(StartGameSequence());
     }
 
@@ -171,6 +182,21 @@ public class GameManager : MonoBehaviour
         playerInstance.GetComponent<PlayerMovement>().enabled = (currentState != GameState.EnemyAdvancing);
         if (opponentInstance.GetComponent<PlayerMovement>() != null)
             opponentInstance.GetComponent<PlayerMovement>().enabled = (currentState != GameState.PlayerAdvancing);
+
+        if (p1Arrow != null && p2Arrow != null)
+        {
+            p1Arrow.SetActive(false);
+            p2Arrow.SetActive(false);
+
+            if (currentState == GameState.PlayerAdvancing)
+            {
+                p1Arrow.SetActive(true);
+            }
+            else if (currentState == GameState.EnemyAdvancing)
+            {
+                p2Arrow.SetActive(true);
+            }
+        }
 
         var ai = opponentInstance.GetComponent<EnemyAI>();
         if (ai != null)
