@@ -15,7 +15,9 @@ public class DamageBox : MonoBehaviour
 
     void Awake()
     {
-        bodyCollider = GetComponentInChildren<Collider2D>();
+        bodyCollider = GetComponent<Collider2D>();
+        if (bodyCollider == null) bodyCollider = GetComponentInChildren<Collider2D>();
+
         rb = GetComponent<Rigidbody2D>();
         if (shieldVisual != null) shieldVisual.SetActive(false);
     }
@@ -34,16 +36,29 @@ public class DamageBox : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        if (bodyCollider != null) bodyCollider.enabled = false;
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Kinematic;
+            rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         }
 
-        var knightControl = GetComponentInChildren<KnightControl>();
-        if (knightControl != null) knightControl.death();
+        if (bodyCollider != null)
+        {
+            bodyCollider.enabled = true;
+        }
 
+        var ai = GetComponent<EnemyAI>();
+        if (ai != null)
+        {
+            ai.Die();
+        }
+
+        var playerMove = GetComponent<PlayerMovement>();
+        if (playerMove != null)
+        {
+            playerMove.enabled = false;
+            GetComponentInChildren<KnightControl>().death();
+        }
         GameManager.Instance.OnCharacterDied(gameObject);
     }
 
@@ -55,19 +70,30 @@ public class DamageBox : MonoBehaviour
             hasShield = false;
             if (shieldVisual != null) shieldVisual.SetActive(false);
         }
+
         gameObject.SetActive(true);
+
         Animator anim = GetComponentInChildren<Animator>();
         if (anim != null) anim.Rebind();
+
         if (bodyCollider != null) bodyCollider.enabled = true;
         if (rb != null)
         {
             rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.constraints = RigidbodyConstraints2D.FreezeRotation;
             rb.linearVelocity = Vector2.zero;
         }
+
         WeaponManager wm = GetComponentInChildren<WeaponManager>();
         if (wm != null) wm.RefreshWeapon();
+
         var pm = GetComponent<PlayerMovement>();
-        if (pm != null) { pm.enabled = true; pm.ResetState(); }
+        if (pm != null)
+        {
+            pm.enabled = true;
+            pm.ResetState();
+        }
+
         var ai = GetComponent<EnemyAI>();
         if (ai != null) ai.ResetState();
     }

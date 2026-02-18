@@ -76,7 +76,14 @@ public class EnemyAI : MonoBehaviour
     {
         if (currentState == EnemyState.Jumping)
         {
-            if (player != null) horizontalMovement = Mathf.Sign(player.position.x - transform.position.x);
+            if (currentState == EnemyState.Advancing)
+            {
+                horizontalMovement = -1f;
+            }
+            else if (player != null)
+            {
+                horizontalMovement = Mathf.Sign(player.position.x - transform.position.x);
+            }
 
             if (isGrounded && rb.linearVelocity.y <= 0.1f)
             {
@@ -85,7 +92,23 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        if (player == null) return;
+        if (currentState == EnemyState.Advancing)
+        {
+            horizontalMovement = -1f;
+            FlipCharacter(-1f);
+
+            if (isGrounded && ShouldJump())
+            {
+                SetState(EnemyState.Jumping);
+            }
+            return;
+        }
+
+        if (player == null)
+        {
+            horizontalMovement = 0;
+            return;
+        }
 
         float distX = player.position.x - transform.position.x;
         float distY = player.position.y - transform.position.y;
@@ -103,7 +126,6 @@ public class EnemyAI : MonoBehaviour
             SetState(EnemyState.Jumping);
             return;
         }
-
         SetState(EnemyState.Chasing);
 
         if (absDistX > 0.6f)
@@ -127,6 +149,7 @@ public class EnemyAI : MonoBehaviour
         {
             case EnemyState.Idle: knightControl.idle(); break;
             case EnemyState.Chasing: knightControl.running(); break;
+            case EnemyState.Advancing: knightControl.running(); break;
             case EnemyState.Attacking: StartCoroutine(AttackSequence()); break;
             case EnemyState.Jumping:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
@@ -145,7 +168,8 @@ public class EnemyAI : MonoBehaviour
         if (weaponManager != null && weaponManager.HasBow())
         {
             yield return new WaitForSeconds(0.4f);
-            weaponManager.ShootArrow(Mathf.Sign(visuals.localScale.x));
+            float dir = visuals.localScale.x;
+            weaponManager.ShootArrow(Mathf.Sign(dir));
             yield return new WaitForSeconds(1.1f);
         }
         else if (weaponManager != null && weaponManager.currentWeapon != null)
@@ -165,7 +189,19 @@ public class EnemyAI : MonoBehaviour
             punchHitbox.SetActive(false);
         }
 
-        SetState(EnemyState.Chasing);
+        if (isDead)
+        {
+            yield break;
+        }
+
+        if (player == null)
+        {
+            SetState(EnemyState.Advancing);
+        }
+        else
+        {
+            SetState(EnemyState.Chasing);
+        }
     }
 
     void FlipCharacter(float moveDirection)
@@ -205,12 +241,24 @@ public class EnemyAI : MonoBehaviour
         Debug.DrawRay(new Vector3(bounds.max.x, bounds.min.y, 0), Vector3.down * 0.2f, debugColor);
     }
 
-    public void StartAdvancing() 
-    { 
-        isDead = false; 
-        isAiActive = true; 
-        player = null; 
-        SetState(EnemyState.Advancing); 
+    public void StartAdvancing()
+    {
+        player = null;
+
+        if (currentState != EnemyState.Attacking)
+        {
+            StopAllCoroutines();
+            if (punchHitbox != null) punchHitbox.SetActive(false);
+            if (weaponManager != null && weaponManager.currentWeapon != null)
+            {
+                var col = weaponManager.currentWeapon.GetComponent<Collider2D>();
+                if (col != null) col.enabled = false;
+            }
+
+            isDead = false;
+            isAiActive = true;
+            SetState(EnemyState.Advancing);
+        }
     }
     public void StartDueling(Transform playerTarget) 
     { 
@@ -224,12 +272,20 @@ public class EnemyAI : MonoBehaviour
         isAiActive = false; 
         SetState(EnemyState.Idle); 
     }
-    public void Die() 
-    { 
-        isDead = true; 
-        isAiActive = false; 
-        rb.linearVelocity = Vector2.zero; 
-        knightControl.death(); 
+    public void Die()
+    {
+        StopAllCoroutines();
+
+        if (punchHitbox != null) punchHitbox.SetActive(false);
+        if (weaponManager != null && weaponManager.currentWeapon != null)
+        {
+            var col = weaponManager.currentWeapon.GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
+        }
+        isDead = true;
+        isAiActive = false;
+        rb.linearVelocity = Vector2.zero;
+        knightControl.death();
     }
     public void ResetState() 
     { 
