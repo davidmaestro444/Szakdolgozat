@@ -3,253 +3,239 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    private enum EnemyState
-    {
-        Idle,
-        Chasing,
-        Attacking,
-        Jumping,
-        Advancing
+    private enum EnemyState 
+    { 
+        Idle, 
+        Chasing, 
+        Attacking, 
+        Jumping, 
+        Advancing 
     }
 
     public float speed = 4f;
-    public float jumpForce = 7f;
-    public float attackRange = 1.5f;
-    public float jumpCheckDistance = 1f;
+    public float jumpForce = 16f;
+    public float attackRange = 1.2f;
+    public float attackCooldown = 1.5f;
+    public float jumpCheckDistance = 1.2f;
     public LayerMask groundLayer;
+
     public Transform player;
+    public Transform visuals;
+    public GameObject punchHitbox;
+
     private Rigidbody2D rb;
     private KnightControl knightControl;
-    private BoxCollider2D bodyCollider;
+    private WeaponManager weaponManager;
+    private CapsuleCollider2D bodyCollider;
+
     private bool isAiActive = false;
-    private float attackCooldown = 2f;
-    private float lastAttackTime;
     private bool isDead = false;
     private EnemyState currentState = EnemyState.Idle;
-    private KnightControl.DummyTrack currentActionTrack;
-    private bool grounded;
+
+    public bool isGrounded;
+
     private float horizontalMovement = 0f;
-    public GameObject attackHitbox;
-    public float attackDuration = 0.3f;
+    private float lastAttackTime;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        bodyCollider = GetComponent<CapsuleCollider2D>();
         knightControl = GetComponentInChildren<KnightControl>();
-        bodyCollider = GetComponent<BoxCollider2D>();
+        weaponManager = GetComponentInChildren<WeaponManager>();
+        if (visuals == null) visuals = transform.Find("Visuals");
     }
 
     void Update()
     {
-        if (!isAiActive)
-        {
-            horizontalMovement = 0;
-            return;
-        }
+        if (!isAiActive || isDead) { horizontalMovement = 0; return; }
 
         CheckGrounded();
-        UpdateState();
+
+        if (currentState != EnemyState.Attacking)
+        {
+            UpdateAILogic();
+        }
     }
 
     private void FixedUpdate()
     {
-        if (isAiActive)
+        if (!isAiActive || isDead) return;
+
+        if (currentState == EnemyState.Attacking)
+        {
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        }
+        else
         {
             rb.linearVelocity = new Vector2(horizontalMovement * speed, rb.linearVelocity.y);
         }
     }
 
-    private void UpdateState()
+    private void UpdateAILogic()
     {
         if (currentState == EnemyState.Jumping)
         {
-            HandleMovementDirection();
-            if (grounded && rb.linearVelocity.y <= 0)
+            if (player != null) horizontalMovement = Mathf.Sign(player.position.x - transform.position.x);
+
+            if (isGrounded && rb.linearVelocity.y <= 0.1f)
             {
-                SetState(isAiActive && player == null ? EnemyState.Advancing : EnemyState.Chasing);
+                SetState(player == null ? EnemyState.Advancing : EnemyState.Chasing);
             }
             return;
         }
 
-        if (currentState == EnemyState.Attacking)
+        if (player == null) return;
+
+        float distX = player.position.x - transform.position.x;
+        float distY = player.position.y - transform.position.y;
+        float absDistX = Mathf.Abs(distX);
+        float currentRange = (weaponManager != null && weaponManager.HasBow()) ? 7f : attackRange;
+
+        if (absDistX <= currentRange && Mathf.Abs(distY) < 1.0f && Time.time > lastAttackTime + attackCooldown && isGrounded)
+        {
+            SetState(EnemyState.Attacking);
+            return;
+        }
+
+        if (isGrounded && ShouldJump())
+        {
+            SetState(EnemyState.Jumping);
+            return;
+        }
+
+        SetState(EnemyState.Chasing);
+
+        if (absDistX > 0.6f)
+        {
+            horizontalMovement = Mathf.Sign(distX);
+            FlipCharacter(horizontalMovement);
+        }
+        else
         {
             horizontalMovement = 0;
-            if (currentActionTrack.IsComplete)
-            {
-                SetState(EnemyState.Chasing);
-            }
-            return;
-        }
-
-        if (currentState == EnemyState.Advancing)
-        {
-            horizontalMovement = -1f;
-            FlipCharacter(-1f);
-
-            if (ShouldJump() && grounded)
-            {
-                SetState(EnemyState.Jumping);
-            }
-            return;
-        }
-
-        if (currentState == EnemyState.Chasing || currentState == EnemyState.Idle)
-        {
-            if (player == null) return;
-
-            float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-
-            if (distanceToPlayer <= attackRange && Time.time > lastAttackTime + attackCooldown && grounded)
-            {
-                SetState(EnemyState.Attacking);
-            }
-            else if (ShouldJump() && grounded)
-            {
-                SetState(EnemyState.Jumping);
-            }
-            else
-            {
-                SetState(EnemyState.Chasing);
-                HandleMovementDirection();
-            }
-        }
-    }
-
-    private void HandleMovementDirection()
-    {
-        if (currentState == EnemyState.Advancing)
-        {
-            horizontalMovement = -1f;
-            FlipCharacter(-1f);
-        }
-        else if (player != null)
-        {
-            float direction = player.position.x > transform.position.x ? 1 : -1;
-            horizontalMovement = direction;
-            FlipCharacter(direction);
+            FlipCharacter(Mathf.Sign(distX));
         }
     }
 
     private void SetState(EnemyState newState)
     {
         if (newState == currentState && newState != EnemyState.Jumping) return;
-
         currentState = newState;
 
         switch (currentState)
         {
-            case EnemyState.Idle:
-                horizontalMovement = 0;
-                knightControl.idle();
-                break;
-            case EnemyState.Chasing:
-            case EnemyState.Advancing:
-                knightControl.running();
-                break;
-            case EnemyState.Attacking:
-                horizontalMovement = 0;
-                lastAttackTime = Time.time;
-                currentActionTrack = knightControl.attack_1();
-                StartCoroutine(AttackSequence());
-                break;
+            case EnemyState.Idle: knightControl.idle(); break;
+            case EnemyState.Chasing: knightControl.running(); break;
+            case EnemyState.Attacking: StartCoroutine(AttackSequence()); break;
             case EnemyState.Jumping:
                 rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
                 rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-                currentActionTrack = knightControl.jump();
+                knightControl.jump();
                 break;
         }
     }
 
-    public void StartAdvancing()
+    IEnumerator AttackSequence()
     {
-        isDead = false;
-        isAiActive = true;
-        player = null;
-        SetState(EnemyState.Advancing);
-    }
+        lastAttackTime = Time.time;
+        horizontalMovement = 0;
+        knightControl.attack_1();
 
-    public void StartDueling(Transform playerTarget)
-    {
-        isDead = false;
-        isAiActive = true;
-        player = playerTarget;
+        if (weaponManager != null && weaponManager.HasBow())
+        {
+            yield return new WaitForSeconds(0.4f);
+            weaponManager.ShootArrow(Mathf.Sign(visuals.localScale.x));
+            yield return new WaitForSeconds(1.1f);
+        }
+        else if (weaponManager != null && weaponManager.currentWeapon != null)
+        {
+            Collider2D weaponCol = weaponManager.currentWeapon.GetComponent<Collider2D>();
+            if (weaponCol != null)
+            {
+                weaponCol.enabled = true;
+                yield return new WaitForSeconds(0.3f);
+                weaponCol.enabled = false;
+            }
+        }
+        else if (punchHitbox != null)
+        {
+            punchHitbox.SetActive(true);
+            yield return new WaitForSeconds(0.3f);
+            punchHitbox.SetActive(false);
+        }
+
         SetState(EnemyState.Chasing);
-    }
-
-    public void DeactivateAI()
-    {
-        if (isDead) return;
-
-        isAiActive = false;
-        horizontalMovement = 0;
-        rb.linearVelocity = Vector2.zero;
-        SetState(EnemyState.Idle);
-    }
-
-    public void Die()
-    {
-        isDead = true;
-        isAiActive = false;
-        horizontalMovement = 0;
-        rb.linearVelocity = Vector2.zero;
-        knightControl.death();
     }
 
     void FlipCharacter(float moveDirection)
     {
-        if (moveDirection > 0 && transform.localScale.x < 0f || moveDirection < 0 && transform.localScale.x > 0f)
-        {
-            Vector3 theScale = transform.localScale;
-            theScale.x *= -1;
-            transform.localScale = theScale;
-        }
+        if (visuals == null) return;
+        Vector3 scale = visuals.localScale;
+        float baseScale = 0.2185436f;
+        scale.x = moveDirection > 0 ? baseScale : -baseScale;
+        visuals.localScale = scale;
     }
 
     private bool ShouldJump()
     {
-        Vector2 rayOrigin = bodyCollider.bounds.center - new Vector3(0, bodyCollider.bounds.extents.y);
-        rayOrigin.x += jumpCheckDistance * transform.localScale.x;
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 0.2f, groundLayer);
+        float lookDir = Mathf.Sign(visuals.localScale.x);
+        Bounds bounds = bodyCollider.bounds;
+
+        Vector2 rayOrigin = new Vector2(transform.position.x + (lookDir * jumpCheckDistance), bounds.min.y + 0.1f);
+
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 2.0f, groundLayer);
+
+        Debug.DrawRay(rayOrigin, Vector2.down * 2.0f, hit.collider == null ? Color.magenta : Color.white);
+
         return hit.collider == null;
     }
 
     private void CheckGrounded()
     {
-        Vector2 boxCenter = (Vector2)bodyCollider.bounds.center + Vector2.down * (bodyCollider.bounds.extents.y + 0.1f);
-        grounded = Physics2D.OverlapBox(boxCenter, new Vector2(bodyCollider.bounds.size.x * 0.9f, 0.1f), 0f, groundLayer);
+        Bounds bounds = bodyCollider.bounds;
+
+        Vector2 boxCenter = new Vector2(bounds.center.x, bounds.min.y - 0.1f);
+        Vector2 boxSize = new Vector2(bounds.size.x * 0.8f, 0.2f);
+
+        isGrounded = Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundLayer);
+
+        Color debugColor = isGrounded ? Color.green : Color.red;
+        Debug.DrawRay(new Vector3(bounds.min.x, bounds.min.y, 0), Vector3.down * 0.2f, debugColor);
+        Debug.DrawRay(new Vector3(bounds.max.x, bounds.min.y, 0), Vector3.down * 0.2f, debugColor);
     }
 
-    /*IEnumerator AttackSequence()
-    {
-        if (attackHitbox != null)
-        {
-            attackHitbox.SetActive(true);
-            yield return new WaitForSeconds(attackDuration);
-            attackHitbox.SetActive(false);
-        }
-    }*/
-    IEnumerator AttackSequence()
-    {
-        if (attackHitbox != null)
-        {
-            Collider2D weaponCollider = attackHitbox.GetComponent<Collider2D>();
-            if (weaponCollider != null)
-            {
-                weaponCollider.enabled = true;
-                yield return new WaitForSeconds(attackDuration);
-                weaponCollider.enabled = false;
-            }
-        }
+    public void StartAdvancing() 
+    { 
+        isDead = false; 
+        isAiActive = true; 
+        player = null; 
+        SetState(EnemyState.Advancing); 
     }
-
-    public void ResetState()
-    {
-        isDead = false;
-        knightControl.idle();
-        currentState = EnemyState.Idle;
-        rb.linearVelocity = Vector2.zero;
-        horizontalMovement = 0;
-        if (attackHitbox != null) attackHitbox.SetActive(false);
-        StopAllCoroutines();
+    public void StartDueling(Transform playerTarget) 
+    { 
+        isDead = false; 
+        isAiActive = true; 
+        player = playerTarget; 
+        SetState(EnemyState.Chasing); 
+    }
+    public void DeactivateAI() 
+    { 
+        isAiActive = false; 
+        SetState(EnemyState.Idle); 
+    }
+    public void Die() 
+    { 
+        isDead = true; 
+        isAiActive = false; 
+        rb.linearVelocity = Vector2.zero; 
+        knightControl.death(); 
+    }
+    public void ResetState() 
+    { 
+        isDead = false; 
+        isAiActive = true; 
+        SetState(EnemyState.Idle); 
+        StopAllCoroutines(); 
     }
 }
