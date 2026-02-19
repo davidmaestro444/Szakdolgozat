@@ -22,16 +22,17 @@ public class DamageBox : MonoBehaviour
         if (shieldVisual != null) shieldVisual.SetActive(false);
     }
 
-    public void GetHit()
+    public void GetHit(bool canBeShielded = true)
     {
         if (Time.time < lastHitTimestamp + hitCooldown) return;
         lastHitTimestamp = Time.time;
 
-        if (hasShield)
+        if (canBeShielded && hasShield)
         {
             DisableShield();
             return;
         }
+
 
         if (isDead) return;
         isDead = true;
@@ -48,10 +49,7 @@ public class DamageBox : MonoBehaviour
         }
 
         var ai = GetComponent<EnemyAI>();
-        if (ai != null)
-        {
-            ai.Die();
-        }
+        if (ai != null) ai.Die();
 
         var playerMove = GetComponent<PlayerMovement>();
         if (playerMove != null)

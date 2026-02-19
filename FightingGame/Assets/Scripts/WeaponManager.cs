@@ -4,18 +4,14 @@ using UnityEngine;
 public class WeaponManager : MonoBehaviour
 {
     public Transform handSocket;
-    public GameObject currentWeapon;
+    public WeaponController currentWeapon;
     public List<GameObject> weaponPrefabs;
     public GameObject arrowPrefab;
-
     private int currentWeaponIndex = 0;
 
     void Start()
     {
-        if (currentWeapon == null && weaponPrefabs.Count > 0 && handSocket.childCount == 0)
-        {
-            EquipWeaponByIndex(0);
-        }
+
     }
 
     void LateUpdate()
@@ -24,76 +20,31 @@ public class WeaponManager : MonoBehaviour
         {
             currentWeapon.transform.localPosition = Vector3.zero;
             currentWeapon.transform.localRotation = Quaternion.identity;
-            if (!currentWeapon.activeSelf) currentWeapon.SetActive(true);
+            currentWeapon.transform.localScale = currentWeapon.equippedScale;
+
+            if (!currentWeapon.gameObject.activeSelf) currentWeapon.gameObject.SetActive(true);
         }
     }
 
     public void RefreshWeapon()
     {
-        if (currentWeapon == null && handSocket != null && handSocket.childCount > 0)
+        if (currentWeapon == null && handSocket.childCount > 0)
         {
-            currentWeapon = handSocket.GetChild(0).gameObject;
+            currentWeapon = handSocket.GetChild(0).GetComponent<WeaponController>();
         }
 
-        if (currentWeapon != null && currentWeapon.transform.parent == handSocket)
+        if (currentWeapon != null)
         {
-            currentWeapon.SetActive(true);
-            currentWeapon.transform.localPosition = Vector3.zero;
-            currentWeapon.transform.localRotation = Quaternion.identity;
-
-            Rigidbody2D rb = currentWeapon.GetComponent<Rigidbody2D>();
-            if (rb != null)
-            {
-                rb.simulated = true;
-                rb.bodyType = RigidbodyType2D.Kinematic;
-                rb.linearVelocity = Vector2.zero;
-                rb.angularVelocity = 0;
-                rb.useFullKinematicContacts = true;
-            }
-
-            Collider2D col = currentWeapon.GetComponent<Collider2D>();
-            if (col != null)
-            {
-                col.enabled = false;
-                col.isTrigger = true;
-            }
+            currentWeapon.gameObject.SetActive(true);
+            currentWeapon.OnEquip();
         }
     }
 
     public void ThrowCurrentWeapon(float direction)
     {
-        if (currentWeapon == null || HasBow()) return;
-
-        GameObject thrown = currentWeapon;
+        if (currentWeapon == null) return;
+        currentWeapon.Throw(direction, transform.root.tag);
         currentWeapon = null;
-        thrown.tag = transform.root.tag;
-        thrown.transform.SetParent(null);
-
-        float offsetDistance = thrown.name.Contains("Spear") ? 1.8f : 1.2f;
-        thrown.transform.position += new Vector3(direction * offsetDistance, 0.5f, 0);
-
-        HitBox hb = thrown.GetComponentInChildren<HitBox>();
-        if (hb != null) hb.PrepareForThrow(transform.root.tag);
-
-        Rigidbody2D rb = thrown.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.simulated = true;
-            rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0;
-            rb.AddForce(new Vector2(direction * 12f, 4f), ForceMode2D.Impulse);
-
-            if (!thrown.name.Contains("Spear"))
-            {
-                rb.AddTorque(-direction * 15f, ForceMode2D.Impulse);
-            }
-            else
-            {
-                float angle = (direction > 0) ? -90f : 90f;
-                thrown.transform.rotation = Quaternion.Euler(0, 0, angle);
-            }
-        }
     }
 
     public bool TryPickUpWeapon()
@@ -103,25 +54,13 @@ public class WeaponManager : MonoBehaviour
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, 2.0f);
         foreach (var hit in hitColliders)
         {
-            bool isSword = hit.name.Contains("Sword") || hit.CompareTag("Sword");
-            bool isSpear = hit.name.Contains("Spear") || hit.CompareTag("Spear");
+            WeaponController foundWeapon = hit.GetComponent<WeaponController>();
 
-            if ((isSword || isSpear) && hit.transform.parent == null)
+            if (foundWeapon != null && hit.transform.parent == null)
             {
-                currentWeapon = hit.gameObject;
+                currentWeapon = foundWeapon;
                 currentWeapon.transform.SetParent(handSocket);
-
-                if (isSpear) currentWeapon.name = "Spear";
-                else currentWeapon.name = "Sword";
-
-                Rigidbody2D rb = currentWeapon.GetComponent<Rigidbody2D>();
-                if (rb != null)
-                {
-                    rb.bodyType = RigidbodyType2D.Kinematic;
-                    rb.simulated = false;
-                }
-
-                RefreshWeapon();
+                currentWeapon.OnEquip();
                 return true;
             }
         }
@@ -131,30 +70,38 @@ public class WeaponManager : MonoBehaviour
     public void EquipWeaponByIndex(int index)
     {
         if (weaponPrefabs == null || weaponPrefabs.Count == 0) return;
-        if (currentWeapon != null && currentWeapon.scene.name != null) Destroy(currentWeapon);
+        foreach (Transform child in handSocket)
+        {
+            Destroy(child.gameObject);
+        }
+        currentWeapon = null;
 
         currentWeaponIndex = index % weaponPrefabs.Count;
         GameObject prefab = weaponPrefabs[currentWeaponIndex];
-        currentWeapon = Instantiate(prefab, handSocket);
-        currentWeapon.name = prefab.name;
-        RefreshWeapon();
+        GameObject spawned = Instantiate(prefab, handSocket);
+        currentWeapon = spawned.GetComponent<WeaponController>();
+
+        if (currentWeapon != null)
+        {
+            currentWeapon.OnEquip();
+            currentWeapon.transform.localPosition = Vector3.zero;
+            currentWeapon.transform.localRotation = Quaternion.identity;
+        }
     }
 
     public void SwitchToNextWeapon()
     {
-        int nextIndex = (currentWeaponIndex + 1) % weaponPrefabs.Count;
-        EquipWeaponByIndex(nextIndex);
+        EquipWeaponByIndex(currentWeaponIndex + 1);
     }
 
     public void ShootArrow(float facingDirection)
     {
         if (arrowPrefab == null) return;
         Vector3 spawnOffset = new Vector3(facingDirection * 0.8f, 0, 0);
-        GameObject arrow = Instantiate(arrowPrefab, handSocket.position + spawnOffset, Quaternion.identity);
-        Arrow projectile = arrow.GetComponent<Arrow>();
+        GameObject arrowObj = Instantiate(arrowPrefab, handSocket.position + spawnOffset, Quaternion.identity);
+        Arrow projectile = arrowObj.GetComponent<Arrow>();
         if (projectile != null) projectile.Launch(facingDirection, transform.root.tag);
     }
-
     public bool HasWeapon() => currentWeapon != null;
-    public bool HasBow() => currentWeapon != null && (currentWeapon.name.ToLower().Contains("bow"));
+    public bool HasBow() => currentWeapon != null && currentWeapon.weaponID == 2;
 }

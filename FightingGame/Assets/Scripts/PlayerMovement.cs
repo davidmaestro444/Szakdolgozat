@@ -49,7 +49,7 @@ public class PlayerMovement : MonoBehaviour
         xInput = Input.GetAxis(horizontalAxis);
         CheckGround();
 
-        if (Input.GetKeyDown(throwKey) && weaponManager.HasWeapon())
+        if (Input.GetKeyDown(throwKey) && weaponManager.HasWeapon() && !weaponManager.HasBow())
         {
             StartCoroutine(ThrowSequence());
         }
@@ -61,7 +61,6 @@ public class PlayerMovement : MonoBehaviour
                 knightControl.idle();
             }
         }
-
         UpdateState();
         FlipCharacter();
     }

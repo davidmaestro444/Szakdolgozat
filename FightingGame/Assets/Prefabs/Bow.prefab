@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7509497483991601200}
   - component: {fileID: 2666662999459960563}
+  - component: {fileID: -2967850440840950409}
   m_Layer: 0
   m_Name: Bow
   m_TagString: Untagged
@@ -88,3 +89,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-2967850440840950409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1563000009595454135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53fdf1b3c0bffde479cdb93131c34ff3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponName: Bow
+  weaponID: 2

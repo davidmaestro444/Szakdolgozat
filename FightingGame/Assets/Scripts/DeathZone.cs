@@ -4,16 +4,14 @@ public class DeathZone : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D other)
     {
-        DamageBox damageBox = other.GetComponent<DamageBox>();
-
-        if (damageBox == null)
+        DamageBox db = other.GetComponentInParent<DamageBox>();
+        if (db != null)
         {
-            damageBox = other.GetComponentInParent<DamageBox>();
+            db.GetHit(false);
         }
-
-        if (damageBox != null)
+        else if (other.CompareTag("Sword") || other.CompareTag("Spear"))
         {
-            damageBox.GetHit();
+            Destroy(other.gameObject);
         }
     }
 }

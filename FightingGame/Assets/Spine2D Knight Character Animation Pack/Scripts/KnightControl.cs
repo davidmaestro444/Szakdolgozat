@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Spine;
-using Spine.Unity;
 
 public class KnightControl : MonoBehaviour
 {
@@ -27,19 +25,12 @@ public class KnightControl : MonoBehaviour
     {
         if (anim == null) return;
 
-        if (weaponManager == null || weaponManager.currentWeapon == null)
-        {
-            anim.Play("char_idle");
-            return;
-        }
+        int wID = (weaponManager != null && weaponManager.currentWeapon != null)
+                  ? weaponManager.currentWeapon.weaponID : 0;
 
-        string wName = weaponManager.currentWeapon.name.ToLower();
-        if (wName.Contains("sword") || wName.Contains("kard"))
-            anim.Play("char_sword_idle");
-        else if (wName.Contains("spear") || wName.Contains("landzsa"))
-            anim.Play("char_spear_idle");
-        else
-            anim.Play("char_idle");
+        if (wID == 1) anim.Play("char_sword_idle");
+        else if (wID == 3) anim.Play("char_spear_idle");
+        else anim.Play("char_idle");
     }
 
     public void running()
@@ -79,7 +70,7 @@ public class KnightControl : MonoBehaviour
 
         if (weaponManager != null && weaponManager.currentWeapon != null)
         {
-            weaponManager.currentWeapon.SetActive(false);
+            weaponManager.currentWeapon.gameObject.SetActive(false);
         }
     }
 

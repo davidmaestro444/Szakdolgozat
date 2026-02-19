@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1266585338839953861}
   - component: {fileID: 8812707720483667309}
   - component: {fileID: -6674855460651396608}
+  - component: {fileID: -5573530886078037007}
   m_Layer: 11
   m_Name: Sword
   m_TagString: Sword
@@ -103,6 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 669fd8fd448d7f847ba00f62f5146a39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ownerTag: 
 --- !u!50 &1266585338839953861
 Rigidbody2D:
   serializedVersion: 5
@@ -188,3 +190,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c07fd2551b515b47922e197274b4198, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-5573530886078037007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8929127329815423100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92682d46a221a7345a2549a4f8e02476, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponName: Sword
+  weaponID: 1
