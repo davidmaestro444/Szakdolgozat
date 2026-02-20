@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -2967850440840950409}
   m_Layer: 0
   m_Name: Bow
-  m_TagString: Untagged
+  m_TagString: Bow
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -103,3 +103,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: Bow
   weaponID: 2
+  equippedScale: {x: 1, y: 1, z: 1}
+  idleAnim: char_idle
+  attackAnim: char_bow_attack
+  throwAnim: 
+  runAnim: char_run

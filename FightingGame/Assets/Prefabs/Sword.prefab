@@ -204,3 +204,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: Sword
   weaponID: 1
+  equippedScale: {x: 1, y: 1, z: 1}
+  idleAnim: char_sword_idle
+  attackAnim: char_sword_attack
+  throwAnim: char_sword_throw
+  runAnim: char_run

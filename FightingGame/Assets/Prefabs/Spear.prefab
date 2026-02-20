@@ -220,3 +220,7 @@ MonoBehaviour:
   weaponName: Spear
   weaponID: 3
   equippedScale: {x: 5, y: 5, z: 1}
+  idleAnim: char_spear_idle
+  attackAnim: char_spear_attack
+  throwAnim: char_spear_throw
+  runAnim: char_run

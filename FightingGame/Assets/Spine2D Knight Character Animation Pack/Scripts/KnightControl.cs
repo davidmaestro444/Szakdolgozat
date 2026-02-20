@@ -6,12 +6,6 @@ public class KnightControl : MonoBehaviour
     private Animator anim;
     private WeaponManager weaponManager;
 
-    public class DummyTrack
-    {
-        public bool IsComplete = true;
-    }
-    private DummyTrack dummy = new DummyTrack();
-
     void Awake()
     {
         anim = GetComponent<Animator>();
@@ -25,63 +19,63 @@ public class KnightControl : MonoBehaviour
     {
         if (anim == null) return;
 
-        int wID = (weaponManager != null && weaponManager.currentWeapon != null)
-                  ? weaponManager.currentWeapon.weaponID : 0;
-
-        if (wID == 1) anim.Play("char_sword_idle");
-        else if (wID == 3) anim.Play("char_spear_idle");
-        else anim.Play("char_idle");
+        if (weaponManager != null && weaponManager.HasWeapon())
+        {
+            anim.Play(weaponManager.currentWeapon.idleAnim);
+        }
+        else
+        {
+            anim.Play("char_idle");
+        }
     }
 
     public void running()
     {
         if (anim == null) return;
-        anim.Play("char_run");
+
+        if (weaponManager != null && weaponManager.HasWeapon())
+            anim.Play(weaponManager.currentWeapon.runAnim);
+        else
+            anim.Play("char_run");
     }
 
-    public DummyTrack attack_1()
+    public void attack_1()
     {
-        if (weaponManager != null && weaponManager.currentWeapon != null)
-        {
-            string wName = weaponManager.currentWeapon.name.ToLower();
+        if (anim == null) return;
 
-            if (wName.Contains("sword") || wName.Contains("kard"))
-                anim.Play("char_sword_attack");
-            else if (wName.Contains("spear") || wName.Contains("landzsa"))
-                anim.Play("char_spear_attack");
-            else if (wName.Contains("bow"))
-                anim.Play("char_bow_attack");
+        if (weaponManager != null && weaponManager.HasWeapon())
+        {
+            anim.Play(weaponManager.currentWeapon.attackAnim);
         }
         else
         {
             anim.Play("char_punch");
         }
-        return dummy;
     }
 
-    public DummyTrack jump()
+    public void jump()
     {
-        anim.Play("char_jump");
-        return dummy;
+        if (anim != null) anim.Play("char_jump");
     }
+
     public void death()
     {
         if (anim != null) anim.Play("char_death");
 
-        if (weaponManager != null && weaponManager.currentWeapon != null)
+        if (weaponManager != null && weaponManager.HasWeapon())
         {
             weaponManager.currentWeapon.gameObject.SetActive(false);
         }
     }
 
-    public void sword_throw()
+    public void weapon_throw()
     {
-        if (anim != null) anim.Play("char_sword_throw");
-    }
+        if (anim == null) return;
 
-    public void spear_throw()
-    {
-        if (anim != null) anim.Play("char_spear_throw");
+        if (weaponManager != null && weaponManager.HasWeapon() && !string.IsNullOrEmpty(weaponManager.currentWeapon.throwAnim))
+        {
+            anim.Play(weaponManager.currentWeapon.throwAnim);
+        }
     }
 
     public void ResetState() => idle();

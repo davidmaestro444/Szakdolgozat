@@ -8,6 +8,7 @@ TagManager:
   - SpawnPoint
   - Sword
   - Spear
+  - Bow
   layers:
   - Default
   - TransparentFX

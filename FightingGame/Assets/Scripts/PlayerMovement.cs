@@ -72,9 +72,9 @@ public class PlayerMovement : MonoBehaviour
 
         string wName = weaponManager.currentWeapon.name.ToLower();
         if (wName.Contains("spear"))
-            knightControl.spear_throw();
+            knightControl.weapon_throw();
         else
-            knightControl.sword_throw();
+            knightControl.weapon_throw();
 
         yield return new WaitForSeconds(0.15f);
 
