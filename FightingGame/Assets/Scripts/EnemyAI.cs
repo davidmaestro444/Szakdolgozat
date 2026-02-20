@@ -44,6 +44,20 @@ public class EnemyAI : MonoBehaviour
         knightControl = GetComponentInChildren<KnightControl>();
         weaponManager = GetComponentInChildren<WeaponManager>();
         if (visuals == null) visuals = transform.Find("Visuals");
+
+        DamageBox db = GetComponent<DamageBox>();
+        if (db != null)
+        {
+            db.OnDeath += Die;
+        }
+    }
+    void OnDestroy()
+    {
+        DamageBox db = GetComponent<DamageBox>();
+        if (db != null)
+        {
+            db.OnDeath -= Die;
+        }
     }
 
     void Update()
@@ -163,7 +177,7 @@ public class EnemyAI : MonoBehaviour
     {
         lastAttackTime = Time.time;
         horizontalMovement = 0;
-        knightControl.attack_1();
+        knightControl.attack();
 
         if (weaponManager != null && weaponManager.HasBow())
         {
@@ -217,25 +231,18 @@ public class EnemyAI : MonoBehaviour
     {
         float lookDir = Mathf.Sign(visuals.localScale.x);
         Bounds bounds = bodyCollider.bounds;
-
         Vector2 rayOrigin = new Vector2(transform.position.x + (lookDir * jumpCheckDistance), bounds.min.y + 0.1f);
-
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, 2.0f, groundLayer);
-
         Debug.DrawRay(rayOrigin, Vector2.down * 2.0f, hit.collider == null ? Color.magenta : Color.white);
-
         return hit.collider == null;
     }
 
     private void CheckGrounded()
     {
         Bounds bounds = bodyCollider.bounds;
-
         Vector2 boxCenter = new Vector2(bounds.center.x, bounds.min.y - 0.1f);
         Vector2 boxSize = new Vector2(bounds.size.x * 0.8f, 0.2f);
-
         isGrounded = Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundLayer);
-
         Color debugColor = isGrounded ? Color.green : Color.red;
         Debug.DrawRay(new Vector3(bounds.min.x, bounds.min.y, 0), Vector3.down * 0.2f, debugColor);
         Debug.DrawRay(new Vector3(bounds.max.x, bounds.min.y, 0), Vector3.down * 0.2f, debugColor);
@@ -244,7 +251,6 @@ public class EnemyAI : MonoBehaviour
     public void StartAdvancing()
     {
         player = null;
-
         if (currentState != EnemyState.Attacking)
         {
             StopAllCoroutines();
@@ -254,7 +260,6 @@ public class EnemyAI : MonoBehaviour
                 var col = weaponManager.currentWeapon.GetComponent<Collider2D>();
                 if (col != null) col.enabled = false;
             }
-
             isDead = false;
             isAiActive = true;
             SetState(EnemyState.Advancing);

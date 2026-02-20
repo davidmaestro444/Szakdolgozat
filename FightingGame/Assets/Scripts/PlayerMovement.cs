@@ -42,6 +42,20 @@ public class PlayerMovement : MonoBehaviour
     {
         body = GetComponent<Rigidbody2D>();
         weaponManager = GetComponentInChildren<WeaponManager>();
+        DamageBox db = GetComponent<DamageBox>();
+        if (db != null)
+        {
+            db.OnDeath += HandleDeath;
+        }
+    }
+
+    void OnDestroy()
+    {
+        DamageBox db = GetComponent<DamageBox>();
+        if (db != null)
+        {
+            db.OnDeath -= HandleDeath;
+        }
     }
 
     void Update()
@@ -78,8 +92,8 @@ public class PlayerMovement : MonoBehaviour
 
         yield return new WaitForSeconds(0.15f);
 
-        float dir = isFacingRight ? 1f : -1f;
-        weaponManager.ThrowCurrentWeapon(dir);
+        float direction = isFacingRight ? 1f : -1f;
+        weaponManager.ThrowCurrentWeapon(direction);
 
         yield return new WaitForSeconds(0.2f);
 
@@ -202,7 +216,7 @@ public class PlayerMovement : MonoBehaviour
             case PlayerState.Idle: knightControl.idle(); break;
             case PlayerState.Running: knightControl.running(); break;
             case PlayerState.Jumping: knightControl.jump(); break;
-            case PlayerState.Attacking: knightControl.attack_1(); break;
+            case PlayerState.Attacking: knightControl.attack(); break;
         }
     }
 
@@ -247,6 +261,13 @@ public class PlayerMovement : MonoBehaviour
         currentState = PlayerState.Idle;
         body.linearVelocity = Vector2.zero;
         if (attackHitbox != null) attackHitbox.SetActive(false);
+        StopAllCoroutines();
+    }
+
+    private void HandleDeath()
+    {
+        this.enabled = false;
+        if (knightControl != null) knightControl.death();
         StopAllCoroutines();
     }
 }

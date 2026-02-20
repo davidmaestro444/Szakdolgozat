@@ -39,7 +39,7 @@ public class KnightControl : MonoBehaviour
             anim.Play("char_run");
     }
 
-    public void attack_1()
+    public void attack()
     {
         if (anim == null) return;
 

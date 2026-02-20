@@ -152,14 +152,30 @@ public class GameManager : MonoBehaviour
 
     void CreateCharacters(Vector3 playerPos, Vector3 opponentPos)
     {
-        if (playerInstance == null) playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+        if (playerInstance == null)
+        {
+            playerInstance = Instantiate(playerPrefab, playerPos, Quaternion.identity);
+            DamageBox playerDb = playerInstance.GetComponent<DamageBox>();
+            if (playerDb != null)
+            {
+                playerDb.OnDeath += () => OnCharacterDied(playerInstance);
+            }
+        }
         else
         {
             playerInstance.transform.position = playerPos;
             playerInstance.SetActive(true);
         }
 
-        if (opponentInstance == null) opponentInstance = Instantiate(opponentPrefab, opponentPos, Quaternion.identity);
+        if (opponentInstance == null)
+        {
+            opponentInstance = Instantiate(opponentPrefab, opponentPos, Quaternion.identity);
+            DamageBox enemyDb = opponentInstance.GetComponent<DamageBox>();
+            if (enemyDb != null)
+            {
+                enemyDb.OnDeath += () => OnCharacterDied(opponentInstance);
+            }
+        }
         else
         {
             opponentInstance.transform.position = opponentPos;

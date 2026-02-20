@@ -37,7 +37,6 @@ public abstract class WeaponController : MonoBehaviour
     {
         EnsureReferences();
         gameObject.tag = originalTag;
-
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;
         transform.localScale = equippedScale;
