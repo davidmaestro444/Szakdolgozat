@@ -32,7 +32,6 @@ public class HitBox : MonoBehaviour
             if (target != null && transform.root != other.transform.root)
             {
                 target.GetHit();
-                if (col != null) col.enabled = false;
             }
             return;
         }
