@@ -37,10 +37,12 @@ public class PlayerMovement : MonoBehaviour
     public KeyCode throwKey = KeyCode.Q;
     public KeyCode interactKey = KeyCode.F;
     private bool isUncontrollable = false;
+    private float defaultGravity;
 
     void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        defaultGravity = body.gravityScale;
         weaponManager = GetComponentInChildren<WeaponManager>();
         DamageBox db = GetComponent<DamageBox>();
         if (db != null)
@@ -262,6 +264,11 @@ public class PlayerMovement : MonoBehaviour
         body.linearVelocity = Vector2.zero;
         if (attackHitbox != null) attackHitbox.SetActive(false);
         StopAllCoroutines();
+        isUncontrollable = false;
+        if (body != null)
+        {
+            body.gravityScale = defaultGravity;
+        }
     }
 
     private void HandleDeath()

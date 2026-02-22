@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     public Transform playerInitialSpawn;
     public Transform opponentInitialSpawn;
     private List<Transform> spawnPoints = new List<Transform>();
-    public int spawnIndexOffset = 1;
+
     public TextMeshProUGUI countdownText;
     private GameObject playerInstance;
     private GameObject opponentInstance;
@@ -43,6 +43,10 @@ public class GameManager : MonoBehaviour
     [Header("Direction Arrows")]
     public GameObject p1Arrow;
     public GameObject p2Arrow;
+
+    private List<GameObject> deadPlayers = new List<GameObject>();
+    private Coroutine respawnCoroutine;
+    public float wallSafeMargin = 1.5f;
 
     private void Awake()
     {
@@ -225,61 +229,138 @@ public class GameManager : MonoBehaviour
 
     public void OnCharacterDied(GameObject character)
     {
-        if (character.CompareTag("Player"))
+        if (!deadPlayers.Contains(character))
         {
-            SetGameState(GameState.EnemyAdvancing);
-            StartCoroutine(Respawn(playerInstance, opponentInstance));
+            deadPlayers.Add(character);
         }
-        else
+
+        if (deadPlayers.Count == 1)
         {
-            SetGameState(GameState.PlayerAdvancing);
-            StartCoroutine(Respawn(opponentInstance, playerInstance));
+            if (character.CompareTag("Player"))
+                SetGameState(GameState.EnemyAdvancing);
+            else
+                SetGameState(GameState.PlayerAdvancing);
+
+            respawnCoroutine = StartCoroutine(RespawnSequence());
+        }
+        else if (deadPlayers.Count == 2)
+        {
+            SetGameState(GameState.Dueling);
         }
     }
 
-    private IEnumerator Respawn(GameObject loser, GameObject winner)
+    private IEnumerator RespawnSequence()
     {
         yield return new WaitForSeconds(respawnDelay);
 
-        loser.SetActive(false);
-
-        var wm = loser.GetComponentInChildren<WeaponManager>();
-        if (wm != null) wm.SwitchToNextWeapon();
-
-        loser.GetComponent<DamageBox>().ResetCharacter();
-
-        Transform respawnPoint = FindBestSpawnPoint(winner);
-        if (respawnPoint != null)
+        if (deadPlayers.Count == 2)
         {
-            loser.transform.position = respawnPoint.position;
+            HandleDrawRespawn();
         }
-        else
+        else if (deadPlayers.Count == 1)
         {
-            float offset = loser.CompareTag("Player") ? -3f : 3f;
-            loser.transform.position = new Vector3(cameraTarget.position.x + offset, loser.transform.position.y, 0);
+            HandleSingleRespawn(deadPlayers[0]);
         }
 
-        loser.SetActive(true);
+        deadPlayers.Clear();
         StartDuel();
     }
 
-    private Transform FindBestSpawnPoint(GameObject winner)
+    private void HandleSingleRespawn(GameObject loser)
     {
-        Vector3 winnerPos = winner.transform.position;
-        List<Transform> candidatePoints = new List<Transform>();
-        if (winner.CompareTag("Player"))
+        bool isPlayer1 = loser.CompareTag("Player");
+        GameObject winner = isPlayer1 ? opponentInstance : playerInstance;
+
+        ResetPlayerState(loser);
+
+        float camHeight = virtualCamera.Lens.OrthographicSize;
+        float camWidth = camHeight * Camera.main.aspect;
+        float camX = Camera.main.transform.position.x;
+        float safeLeftBound = (camX - camWidth) + wallSafeMargin;
+        float safeRightBound = (camX + camWidth) - wallSafeMargin;
+        List<Transform> visibleSpawns = spawnPoints.Where(sp => sp.position.x >= safeLeftBound && sp.position.x <= safeRightBound).ToList();
+
+        Transform selectedSpawn = null;
+
+        if (visibleSpawns.Count > 0)
         {
-            foreach (var point in spawnPoints) { if (point.position.x > winnerPos.x) candidatePoints.Add(point); }
-            candidatePoints = candidatePoints.OrderBy(p => p.position.x).ToList();
+            float zoneWidth = (safeRightBound - safeLeftBound) / 3f;
+            float minX, maxX;
+
+            if (isPlayer1)
+            {
+                minX = safeLeftBound;
+                maxX = safeLeftBound + zoneWidth;
+            }
+            else
+            {
+                minX = safeRightBound - zoneWidth;
+                maxX = safeRightBound;
+            }
+
+            List<Transform> preferredSpawns = visibleSpawns.Where(sp => sp.position.x >= minX && sp.position.x <= maxX).ToList();
+            if (preferredSpawns.Count > 0)
+            {
+                selectedSpawn = preferredSpawns[Random.Range(0, preferredSpawns.Count)];
+            }
+            else
+            {
+                if (isPlayer1)
+                {
+                    selectedSpawn = visibleSpawns.OrderBy(sp => sp.position.x).First();
+                }
+                else
+                {
+                    selectedSpawn = visibleSpawns.OrderByDescending(sp => sp.position.x).First();
+                }
+            }
+        }
+
+        if (selectedSpawn != null)
+        {
+            loser.transform.position = selectedSpawn.position;
+            loser.SetActive(true);
+        }
+    }
+
+    private void HandleDrawRespawn()
+    {
+        float camHeight = virtualCamera.Lens.OrthographicSize;
+        float camWidth = camHeight * Camera.main.aspect;
+        float camX = Camera.main.transform.position.x;
+        float safeLeftBound = (camX - camWidth) + wallSafeMargin;
+        float safeRightBound = (camX + camWidth) - wallSafeMargin;
+        var visibleSpawns = spawnPoints.Where(sp => sp.position.x >= safeLeftBound && sp.position.x <= safeRightBound).OrderBy(sp => sp.position.x).ToList();
+
+        ResetPlayerState(playerInstance);
+        ResetPlayerState(opponentInstance);
+
+        if (visibleSpawns.Count >= 2)
+        {
+            playerInstance.transform.position = visibleSpawns.First().position;
+            opponentInstance.transform.position = visibleSpawns.Last().position;
+
+            playerInstance.SetActive(true);
+            opponentInstance.SetActive(true);
         }
         else
         {
-            foreach (var point in spawnPoints) { if (point.position.x < winnerPos.x) candidatePoints.Add(point); }
-            candidatePoints = candidatePoints.OrderByDescending(p => p.position.x).ToList();
+            playerInstance.transform.position = new Vector3(safeLeftBound, playerInstance.transform.position.y, 0);
+            opponentInstance.transform.position = new Vector3(safeRightBound, opponentInstance.transform.position.y, 0);
+
+            playerInstance.SetActive(true);
+            opponentInstance.SetActive(true);
         }
-        if (candidatePoints.Count == 0) return null;
-        int targetIndex = Mathf.Min(spawnIndexOffset, candidatePoints.Count - 1);
-        return candidatePoints[targetIndex];
+    }
+
+    private void ResetPlayerState(GameObject character)
+    {
+        character.SetActive(false);
+        var wm = character.GetComponentInChildren<WeaponManager>();
+        if (wm != null) wm.SwitchToNextWeapon();
+        character.GetComponent<DamageBox>().ResetCharacter();
+        var pm = character.GetComponent<PlayerMovement>();
+        if (pm != null) pm.ResetState();
     }
 
     public void EndGame(string winnerTag)
@@ -289,7 +370,6 @@ public class GameManager : MonoBehaviour
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);
-
             if (winnerTag == "Player" || winnerTag == "Player1")
             {
                 winnerText.text = "PLAYER 1 WINS!";
@@ -302,6 +382,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
     public void RestartGame()
     {
         Time.timeScale = 1f;
