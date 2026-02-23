@@ -12,7 +12,7 @@ public class BackgroundManager : MonoBehaviour
     public Transform cameraTransform;
     private List<GameObject> activeChunks = new List<GameObject>();
     private float autoScrollOffset = 0f;
-
+    public float yOffset = 0f;
     void Start()
     {
         if (cameraTransform == null) cameraTransform = Camera.main.transform;
@@ -50,7 +50,7 @@ public class BackgroundManager : MonoBehaviour
         for (int i = 0; i < activeChunks.Count; i++)
         {
             float xPos = cameraTransform.position.x + (i * chunkWidth) - (totalOffset % chunkWidth) - (chunkWidth / 2);
-            activeChunks[i].transform.position = new Vector3(xPos, cameraTransform.position.y, transform.position.z);
+            activeChunks[i].transform.position = new Vector3(xPos, cameraTransform.position.y + yOffset, transform.position.z);
         }
     }
 }

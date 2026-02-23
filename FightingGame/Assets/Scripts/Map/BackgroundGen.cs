@@ -11,9 +11,10 @@ public class BackgroundGen : MonoBehaviour
     [Range(0f, 1f)]
     public float persistence = 0.5f;
     public float lacunarity = 2f;
-    public Color groundColor = new Color(0.4f, 0.2f, 0.1f);
-    public Color skyColor = new Color(0.5f, 0.8f, 1.0f);
-    public float scrollSpeed = 0.5f;
+    public Color groundColor = new Color(0.76f, 0.68f, 0.51f, 1f);
+    public float baseTrainSpeed = 5f;
+    [Range(0, 1)]
+    public float parallaxFactor = 0.5f;
 
     private Texture2D texture;
     private Color[] pixelData;
@@ -24,8 +25,10 @@ public class BackgroundGen : MonoBehaviour
     void Start()
     {
         quadRenderer = GetComponent<MeshRenderer>();
-        texture = new Texture2D(textureWidth, textureHeight);
+        texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
         texture.wrapMode = TextureWrapMode.Repeat;
+        texture.filterMode = FilterMode.Bilinear;
+
         pixelData = new Color[textureWidth * textureHeight];
         if (seed == 0) { seed = Random.Range(0f, 100f); }
 
@@ -39,7 +42,7 @@ public class BackgroundGen : MonoBehaviour
 
     void Update()
     {
-        float scrollThisFrame = scrollSpeed * Time.deltaTime;
+        float scrollThisFrame = (baseTrainSpeed * (1 - parallaxFactor)) * Time.deltaTime;
         totalOffset += scrollThisFrame;
         quadRenderer.material.mainTextureOffset = new Vector2(totalOffset, 0);
 
@@ -90,7 +93,7 @@ public class BackgroundGen : MonoBehaviour
             }
             else
             {
-                pixelData[pixelIndex] = skyColor;
+                pixelData[pixelIndex] = Color.clear;
             }
         }
     }
