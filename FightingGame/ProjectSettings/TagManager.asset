@@ -46,6 +46,18 @@ TagManager:
   - name: Background
     uniqueID: 3044445303
     locked: 0
+  - name: Sky
+    uniqueID: 4256359779
+    locked: 0
+  - name: Hill
+    uniqueID: 1310709169
+    locked: 0
+  - name: Landscape
+    uniqueID: 409286433
+    locked: 0
+  - name: Rock
+    uniqueID: 3130071285
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
