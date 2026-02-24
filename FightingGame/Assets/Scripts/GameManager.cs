@@ -358,9 +358,12 @@ public class GameManager : MonoBehaviour
         character.SetActive(false);
         var wm = character.GetComponentInChildren<WeaponManager>();
         if (wm != null) wm.SwitchToNextWeapon();
-        character.GetComponent<DamageBox>().ResetCharacter();
-        var pm = character.GetComponent<PlayerMovement>();
-        if (pm != null) pm.ResetState();
+
+        var damageBox = character.GetComponent<DamageBox>();
+        if (damageBox != null) damageBox.ResetCharacter();
+
+        var charBase = character.GetComponent<CharacterBase>();
+        if (charBase != null) charBase.ResetState();
     }
 
     public void EndGame(string winnerTag)

@@ -69,7 +69,7 @@ public class BrakeLever : MonoBehaviour
 
         foreach (PlayerMovement p in allPlayers)
         {
-            if (p.grounded)
+            if (p.Grounded)
             {
                 p.ApplyKnockback(new Vector2(brakeForce, 1f), stunDuration);
             }

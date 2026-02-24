@@ -129,18 +129,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 093d7c724216d6846ac0f502d7dd0a83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
+  moveSpeed: 6
   jumpForce: 14
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  visualContainer: {fileID: 6026700438554617569}
+  attackHitbox: {fileID: 1550991927798191529}
   attackRange: 1.5
   attackCooldown: 2
   jumpCheckDistance: 1.2
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 1024
   player: {fileID: 0}
-  visuals: {fileID: 6026700438554617569}
-  punchHitbox: {fileID: 1550991927798191529}
-  isGrounded: 0
+  isAiActive: 0
 --- !u!1 &774570043063620107
 GameObject:
   m_ObjectHideFlags: 0

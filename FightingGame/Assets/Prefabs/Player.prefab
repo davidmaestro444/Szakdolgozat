@@ -78,23 +78,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cf7b3ca57c5d344cb5258414754597b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalAxis: Horizontal
-  jumpButton: Vertical
-  attackKey: 32
-  groundspeed: 6
+  moveSpeed: 6
   jumpForce: 14
-  body: {fileID: 7451562961646730810}
-  groundCheck: {fileID: 7458100424064135253}
   groundMask:
     serializedVersion: 2
     m_Bits: 1024
+  visualContainer: {fileID: 6026700438554617569}
   attackHitbox: {fileID: 1550991927798191529}
-  attackDuration: 0.3
-  knightControl: {fileID: 6839012024030873805}
-  knightVisuals: {fileID: 6026700438554617569}
-  grounded: 0
-  bowAttackDuration: 2
-  bowShootDelay: 0.4
+  horizontalAxis: Horizontal
+  jumpButton: Vertical
+  attackKey: 32
   throwKey: 113
   interactKey: 102
 --- !u!114 &1193849037436359577
