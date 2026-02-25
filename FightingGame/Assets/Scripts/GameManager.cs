@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
         cameraTarget.position = lockedDuelPos;
         virtualCamera.ForceCameraPosition(lockedDuelPos, Quaternion.identity);
         playerInstance.GetComponent<PlayerMovement>().enabled = false;
-        var p2Move = opponentInstance.GetComponent<PlayerMovement>();
+        PlayerMovement p2Move = opponentInstance.GetComponent<PlayerMovement>();
         if (p2Move != null) p2Move.enabled = false;
 
         countdownText.gameObject.SetActive(true);
@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour
         float midX = (playerInstance.transform.position.x + opponentInstance.transform.position.x) / 2f;
         lockedDuelPos = new Vector3(midX, cameraTarget.position.y, 0);
 
-        var ai = opponentInstance.GetComponent<EnemyAI>();
+        EnemyAI ai = opponentInstance.GetComponent<EnemyAI>();
         if (ai != null) ai.player = playerInstance.transform;
 
         SetGameState(GameState.Dueling);
@@ -216,7 +216,7 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        var ai = opponentInstance.GetComponent<EnemyAI>();
+        EnemyAI ai = opponentInstance.GetComponent<EnemyAI>();
         if (ai != null)
         {
             if (currentState == GameState.Dueling) ai.StartDueling(playerInstance.transform);
@@ -328,7 +328,7 @@ public class GameManager : MonoBehaviour
         float camX = Camera.main.transform.position.x;
         float safeLeftBound = (camX - camWidth) + wallSafeMargin;
         float safeRightBound = (camX + camWidth) - wallSafeMargin;
-        var visibleSpawns = spawnPoints.Where(sp => sp.position.x >= safeLeftBound && sp.position.x <= safeRightBound).OrderBy(sp => sp.position.x).ToList();
+        List<Transform> visibleSpawns = spawnPoints.Where(sp => sp.position.x >= safeLeftBound && sp.position.x <= safeRightBound).OrderBy(sp => sp.position.x).ToList();
 
         ResetPlayerState(playerInstance);
         ResetPlayerState(opponentInstance);
@@ -354,13 +354,13 @@ public class GameManager : MonoBehaviour
     private void ResetPlayerState(GameObject character)
     {
         character.SetActive(false);
-        var wm = character.GetComponentInChildren<WeaponManager>();
+        WeaponManager wm = character.GetComponentInChildren<WeaponManager>();
         if (wm != null) wm.SwitchToNextWeapon();
 
-        var damageBox = character.GetComponent<DamageBox>();
+        DamageBox damageBox = character.GetComponent<DamageBox>();
         if (damageBox != null) damageBox.ResetCharacter();
 
-        var charBase = character.GetComponent<CharacterBase>();
+        CharacterBase charBase = character.GetComponent<CharacterBase>();
         if (charBase != null) charBase.ResetState();
     }
 

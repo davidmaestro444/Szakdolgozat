@@ -3,8 +3,8 @@ using UnityEngine;
 
 public abstract class CharacterBase : MonoBehaviour
 {
-    [SerializeField] protected float moveSpeed = 4f;
-    [SerializeField] protected float jumpForce = 7f;
+    [SerializeField] protected float moveSpeed = 6f;
+    [SerializeField] protected float jumpForce = 14f;
     [SerializeField] protected LayerMask groundMask;
     [SerializeField] protected Transform visualContainer;
     [SerializeField] protected GameObject attackHitbox;
@@ -175,7 +175,7 @@ public abstract class CharacterBase : MonoBehaviour
         }
         else if (weaponManager.currentWeapon != null)
         {
-            var weaponCol = weaponManager.currentWeapon.GetComponent<Collider2D>();
+            Collider2D weaponCol = weaponManager.currentWeapon.GetComponent<Collider2D>();
             if (weaponCol != null)
             {
                 weaponCol.enabled = true;
