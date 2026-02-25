@@ -36,11 +36,9 @@ public class GameManager : MonoBehaviour
     private GameObject opponentInstance;
     private Vector3 lockedDuelPos;
 
-    [Header("Victory Screen")]
     public GameObject victoryPanel;
     public TextMeshProUGUI winnerText;
 
-    [Header("Direction Arrows")]
     public GameObject p1Arrow;
     public GameObject p2Arrow;
 

@@ -1675,6 +1675,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3836401945457780766, guid: 2568bfa6b17ac2e4fada75888f927770,
+        type: 3}
+      propertyPath: m_TagString
+      value: HighGround
+      objectReference: {fileID: 0}
     - target: {fileID: 9010976653638649219, guid: 2568bfa6b17ac2e4fada75888f927770,
         type: 3}
       propertyPath: m_Size.x
@@ -2632,7 +2637,7 @@ GameObject:
   - component: {fileID: 383051959}
   m_Layer: 10
   m_Name: UpperplatformTilemap
-  m_TagString: Untagged
+  m_TagString: HighGround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5466,7 +5471,7 @@ GameObject:
   - component: {fileID: 1101017132}
   m_Layer: 0
   m_Name: UpperPlatforms
-  m_TagString: Untagged
+  m_TagString: HighGround
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5618,8 +5623,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTarget: {fileID: 1247611509}
-  leftLimit: {fileID: 0}
-  rightLimit: {fileID: 0}
+  leftLimit: {fileID: 345668296}
+  rightLimit: {fileID: 1070048881}
   segments:
   - {fileID: 174978746}
   - {fileID: 1334628139}

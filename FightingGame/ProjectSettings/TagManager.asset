@@ -9,6 +9,7 @@ TagManager:
   - Sword
   - Spear
   - Bow
+  - HighGround
   layers:
   - Default
   - TransparentFX

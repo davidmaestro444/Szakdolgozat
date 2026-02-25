@@ -30,6 +30,9 @@ public abstract class CharacterBase : MonoBehaviour
             return isGrounded;
         }
     }
+
+    public bool IsOnHighGround { get; private set; }
+
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -98,7 +101,21 @@ public abstract class CharacterBase : MonoBehaviour
         Bounds bounds = mainCollider.bounds;
         Vector2 boxCenter = new Vector2(bounds.center.x, bounds.min.y - 0.1f);
         Vector2 boxSize = new Vector2(bounds.size.x * 0.8f, 0.2f);
-        isGrounded = Physics2D.OverlapBox(boxCenter, boxSize, 0f, groundMask);
+        Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, boxSize, 0f, groundMask);
+
+        isGrounded = hits.Length > 0;
+        IsOnHighGround = false;
+
+        foreach (var hit in hits)
+        {
+            if (hit == mainCollider) continue;
+
+            if (hit.CompareTag("HighGround"))
+            {
+                IsOnHighGround = true;
+                break;
+            }
+        }
     }
 
     protected void FlipCharacter(float input)
