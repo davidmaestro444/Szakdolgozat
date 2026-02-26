@@ -9,7 +9,6 @@ public class ProgressBar : MonoBehaviour
     public Transform rightLimit;
     public List<Image> segments;
 
-    [Header("Colors")]
     public Color p1Color = Color.yellow;
     public Color p2Color = Color.blue;
     public Color neutralColor = Color.white;

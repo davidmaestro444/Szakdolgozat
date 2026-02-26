@@ -17,11 +17,11 @@ public abstract class WeaponController : MonoBehaviour
 
     protected virtual void Awake()
     {
-        EnsureReferences();
+        SetupReferences();
     }
 
 
-    protected void EnsureReferences()
+    protected void SetupReferences()
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();
         if (col == null) col = GetComponent<Collider2D>();
@@ -35,7 +35,7 @@ public abstract class WeaponController : MonoBehaviour
 
     public virtual void OnEquip()
     {
-        EnsureReferences();
+        SetupReferences();
         gameObject.tag = originalTag;
         transform.localPosition = Vector3.zero;
         transform.localRotation = Quaternion.identity;

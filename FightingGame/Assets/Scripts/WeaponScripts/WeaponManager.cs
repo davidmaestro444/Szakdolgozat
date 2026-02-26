@@ -102,6 +102,20 @@ public class WeaponManager : MonoBehaviour
         Arrow projectile = arrowObj.GetComponent<Arrow>();
         if (projectile != null) projectile.Launch(facingDirection, transform.root.tag);
     }
-    public bool HasWeapon() => currentWeapon != null;
-    public bool HasBow() => currentWeapon != null && currentWeapon.weaponID == 2;
+    public bool HasWeapon()
+    {
+        return currentWeapon != null;
+    }
+
+    public bool HasBow()
+    {
+        if (currentWeapon != null && currentWeapon.name.ToLower().Contains("bow"))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
