@@ -4,17 +4,20 @@ public class BackgroundGen : MonoBehaviour
 {
     public int textureWidth = 1024;
     public int textureHeight = 256;
-    public float noiseScale = 0.005f;
+    public float noiseScale = 0.002f;
     public float seed;
     [Range(1, 8)]
-    public int octaves = 4;
+    public int octaves = 2;
     [Range(0f, 1f)]
-    public float persistence = 0.5f;
+    public float persistence = 0.3f;
     public float lacunarity = 2f;
+    [Range(0.01f, 1f)]
+    public float heightMultiplier = 0.25f;
+    public int yOffset = 0;
     public Color groundColor = new Color(0.76f, 0.68f, 0.51f, 1f);
     public float baseTrainSpeed = 5f;
     [Range(0, 1)]
-    public float parallaxFactor = 0.5f;
+    public float parallaxFactor = 0.9f;
 
     private Texture2D texture;
     private Color[] pixelData;
@@ -25,6 +28,8 @@ public class BackgroundGen : MonoBehaviour
     void Start()
     {
         quadRenderer = GetComponent<MeshRenderer>();
+        quadRenderer.sortingLayerName = "Hill";
+        quadRenderer.sortingOrder = -5;
         texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
         texture.wrapMode = TextureWrapMode.Repeat;
         texture.filterMode = FilterMode.Bilinear;
@@ -37,6 +42,8 @@ public class BackgroundGen : MonoBehaviour
             GenerateColumn(x, x);
         }
         ApplyPixelDataToTexture();
+
+        if (quadRenderer.material.HasProperty("_BaseMap")) quadRenderer.material.SetTexture("_BaseMap", texture);
         quadRenderer.material.mainTexture = texture;
     }
 
@@ -57,7 +64,6 @@ public class BackgroundGen : MonoBehaviour
                 int localColumnIndex = globalColumnIndex % textureWidth;
                 GenerateColumn(localColumnIndex, globalColumnIndex);
             }
-
             ApplyPixelDataToTexture();
             nextColumnToGenerate += pixelsToGenerate;
         }
@@ -80,9 +86,8 @@ public class BackgroundGen : MonoBehaviour
             amplitude *= persistence;
             frequency *= lacunarity;
         }
-
         float normalizedNoise = totalNoiseValue / maxAmplitude;
-        int height = Mathf.RoundToInt(normalizedNoise * textureHeight);
+        int height = Mathf.RoundToInt((normalizedNoise * textureHeight * heightMultiplier) + yOffset);
 
         for (int y = 0; y < textureHeight; y++)
         {
