@@ -14,6 +14,8 @@ public class BackgroundGen : MonoBehaviour
     [Range(0.01f, 1f)]
     public float heightMultiplier = 0.25f;
     public int yOffset = 0;
+
+    public Texture2D paperTexture;
     public Color groundColor = new Color(0.76f, 0.68f, 0.51f, 1f);
     public float baseTrainSpeed = 5f;
     [Range(0, 1)]
@@ -28,8 +30,6 @@ public class BackgroundGen : MonoBehaviour
     void Start()
     {
         quadRenderer = GetComponent<MeshRenderer>();
-        quadRenderer.sortingLayerName = "Hill";
-        quadRenderer.sortingOrder = -5;
         texture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
         texture.wrapMode = TextureWrapMode.Repeat;
         texture.filterMode = FilterMode.Bilinear;
@@ -86,20 +86,24 @@ public class BackgroundGen : MonoBehaviour
             amplitude *= persistence;
             frequency *= lacunarity;
         }
+
         float normalizedNoise = totalNoiseValue / maxAmplitude;
-        int height = Mathf.RoundToInt((normalizedNoise * textureHeight * heightMultiplier) + yOffset);
+        float exactHeight = (normalizedNoise * textureHeight * heightMultiplier) + yOffset;
 
         for (int y = 0; y < textureHeight; y++)
         {
             int pixelIndex = y * textureWidth + localX;
-            if (y < height)
+            Color finalColor = groundColor;
+            if (paperTexture != null)
             {
-                pixelData[pixelIndex] = groundColor;
+                int paperX = localX % paperTexture.width;
+                int paperY = y % paperTexture.height;
+                finalColor = paperTexture.GetPixel(paperX, paperY) * groundColor;
             }
-            else
-            {
-                pixelData[pixelIndex] = Color.clear;
-            }
+            float distance = exactHeight - (float)y;
+            float alpha = Mathf.Clamp01(distance);
+            finalColor.a = alpha;
+            pixelData[pixelIndex] = finalColor;
         }
     }
 
