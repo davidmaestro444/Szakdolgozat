@@ -8,15 +8,9 @@ public class GoalTrigger : MonoBehaviour
     {
         if (other.transform.root.CompareTag(targetTag))
         {
-            bool isRealCharacter = other.transform.root.GetComponent<PlayerMovement>() != null ||other.transform.root.GetComponent<EnemyAI>() != null;
-
-            if (isRealCharacter)
+            if (GameManager.Instance != null)
             {
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.EndGame(targetTag);
-                }
-                GetComponent<Collider2D>().enabled = false;
+                GameManager.Instance.EndGame(targetTag);
             }
         }
     }

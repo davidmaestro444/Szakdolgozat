@@ -95,6 +95,16 @@ public abstract class CharacterBase : MonoBehaviour
         }
     }
 
+    public void AIMove(float direction)
+    {
+        Move(direction);
+    }
+
+    public void AIJump()
+    {
+        TryJump();
+    }
+
     protected void CheckGround()
     {
         if (mainCollider == null) return;

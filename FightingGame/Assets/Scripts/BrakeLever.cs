@@ -41,21 +41,24 @@ public class BrakeLever : MonoBehaviour
 
         foreach (PlayerMovement pm in playersInZone)
         {
-            if (pm != null && Input.GetKeyDown(pm.interactKey))
-            {
-                ActivateBrake();
-                break;
-            }
+
         }
     }
 
-    private void ActivateBrake()
+    public void ActivateBrake()
     {
         isActivated = true;
 
         if (spriteRenderer != null && leverRight != null) spriteRenderer.sprite = leverRight;
 
         ApplyBrakeForceToAll();
+    }
+    public void TryActivate(PlayerMovement pm)
+    {
+        if (playersInZone.Contains(pm) && !isActivated)
+        {
+            ActivateBrake();
+        }
     }
 
     private void ApplyBrakeForceToAll()
