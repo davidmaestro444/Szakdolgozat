@@ -46,6 +46,8 @@ public class GameManager : MonoBehaviour
     private Coroutine respawnCoroutine;
     public float wallSafeMargin = 1.5f;
 
+    public bool isTrainingMode = false;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(this); }
@@ -366,8 +368,13 @@ public class GameManager : MonoBehaviour
 
     public void EndGame(string winnerTag)
     {
-        Time.timeScale = 0f;
+        if (isTrainingMode)
+        {
+            RestartGame();
+            return;
+        }
 
+        Time.timeScale = 0f;
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);

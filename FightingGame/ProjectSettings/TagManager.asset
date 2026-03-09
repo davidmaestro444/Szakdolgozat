@@ -10,6 +10,7 @@ TagManager:
   - Spear
   - Bow
   - HighGround
+  - DeathZone
   layers:
   - Default
   - TransparentFX

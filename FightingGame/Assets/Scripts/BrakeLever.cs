@@ -41,7 +41,11 @@ public class BrakeLever : MonoBehaviour
 
         foreach (PlayerMovement pm in playersInZone)
         {
-
+            if (pm != null && Input.GetKeyDown(pm.interactKey))
+            {
+                ActivateBrake();
+                break;
+            }
         }
     }
 

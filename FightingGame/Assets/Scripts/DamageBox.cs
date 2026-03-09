@@ -6,7 +6,7 @@ public class DamageBox : MonoBehaviour
     public event Action OnDeath;
     public event Action OnHit;
 
-    private bool isDead = false;
+    public bool isDead = false;
     private Collider2D bodyCollider;
     private Rigidbody2D rb;
 
