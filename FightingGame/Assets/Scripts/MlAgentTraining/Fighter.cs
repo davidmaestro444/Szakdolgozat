@@ -13,7 +13,9 @@ public class Fighter : Agent
 
     private Transform myTargetGoal;
     private Transform enemyBody;
+    private DamageBox enemyDamageBox;
     private int lastJumpAction = 0;
+    private bool enemyEventsSubscribed = false;
 
     public override void Initialize()
     {
@@ -34,13 +36,28 @@ public class Fighter : Agent
         EndEpisode();
     }
 
+    void OnEnemyKilled()
+    {
+        AddReward(0.5f);
+    }
+
     public override void CollectObservations(VectorSensor sensor)
     {
-        if (enemyBody == null)
+        if (enemyDamageBox == null)
         {
             string enemyTag = isPlayerOne ? "Enemy" : "Player";
             GameObject enemyObj = GameObject.FindGameObjectWithTag(enemyTag);
-            if (enemyObj != null) enemyBody = enemyObj.transform;
+            if (enemyObj != null)
+            {
+                enemyBody = enemyObj.transform;
+                enemyDamageBox = enemyObj.GetComponent<DamageBox>();
+
+                if (enemyDamageBox != null && !enemyEventsSubscribed)
+                {
+                    enemyDamageBox.OnDeath += OnEnemyKilled;
+                    enemyEventsSubscribed = true;
+                }
+            }
         }
 
         if (enemyBody == null || myTargetGoal == null)
@@ -50,9 +67,12 @@ public class Fighter : Agent
             sensor.AddObservation(0f);
             sensor.AddObservation(0f);
             sensor.AddObservation(0f);
+            sensor.AddObservation(0f);
             return;
         }
 
+        bool isEnemyAlive = enemyBody.gameObject.activeInHierarchy && !enemyDamageBox.isDead;
+        sensor.AddObservation(isEnemyAlive ? 1f : 0f);
         float distanceToGoal = transform.position.x - myTargetGoal.position.x;
         sensor.AddObservation(distanceToGoal / 20f);
         Vector3 dirToEnemy = enemyBody.position - transform.position;
@@ -84,16 +104,24 @@ public class Fighter : Agent
         {
             playerMovement.aiInteractTriggered = true;
         }
-
-        AddReward(-0.0005f);
+        AddReward(-0.0002f);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (myTargetGoal != null && other.gameObject == myTargetGoal.gameObject)
         {
-            AddReward(2.0f);
+            AddReward(1.0f);
             EndEpisode();
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (damageBox != null) damageBox.OnDeath -= OnAgentDeath;
+        if (enemyDamageBox != null)
+        {
+            enemyDamageBox.OnDeath -= OnEnemyKilled;
         }
     }
 
