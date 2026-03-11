@@ -42,6 +42,7 @@ public class BackgroundGen : MonoBehaviour
             GenerateColumn(x, x);
         }
         ApplyPixelDataToTexture();
+        nextColumnToGenerate = textureWidth;
 
         if (quadRenderer.material.HasProperty("_BaseMap")) quadRenderer.material.SetTexture("_BaseMap", texture);
         quadRenderer.material.mainTexture = texture;
@@ -53,7 +54,7 @@ public class BackgroundGen : MonoBehaviour
         totalOffset += scrollThisFrame;
         quadRenderer.material.mainTextureOffset = new Vector2(totalOffset, 0);
 
-        int currentGlobalPixel = Mathf.FloorToInt(totalOffset * textureWidth);
+        int currentGlobalPixel = textureWidth + Mathf.FloorToInt(totalOffset * textureWidth);
         int pixelsToGenerate = currentGlobalPixel - nextColumnToGenerate;
 
         if (pixelsToGenerate > 0)

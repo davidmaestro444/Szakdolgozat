@@ -29,6 +29,10 @@ public class Fighter : Agent
         else
             myTargetGoal = GameObject.Find("OpponentGoal").transform;
     }
+    public override void OnEpisodeBegin()
+    {
+        lastJumpAction = 0;
+    }
 
     void OnAgentDeath()
     {
