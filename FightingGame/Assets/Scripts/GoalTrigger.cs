@@ -6,11 +6,18 @@ public class GoalTrigger : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.transform.root.CompareTag(targetTag))
+        Fighter agent = other.transform.root.GetComponent<Fighter>();
+        CharacterBase character = other.transform.root.GetComponent<CharacterBase>();
+
+        if (agent != null || character != null)
         {
-            if (GameManager.Instance != null)
+            if (other.transform.root.CompareTag(targetTag))
             {
-                GameManager.Instance.EndGame(targetTag);
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.EndGame(targetTag);
+                }
+                GetComponent<Collider2D>().enabled = false;
             }
         }
     }

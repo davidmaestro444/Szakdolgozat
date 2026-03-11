@@ -146,6 +146,7 @@ MonoBehaviour:
   throwKey: 259
   interactKey: 258
   aiInteractTriggered: 0
+  isAI: 0
 --- !u!114 &473350416413058605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,7 +160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 7
+    VectorObservationSize: 8
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 1
