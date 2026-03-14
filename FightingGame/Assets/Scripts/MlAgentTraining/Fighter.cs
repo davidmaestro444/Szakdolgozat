@@ -84,6 +84,16 @@ public class Fighter : Agent
         sensor.AddObservation(dirToEnemy.magnitude / 20f);
         sensor.AddObservation(weaponManager.HasBow() ? 1f : 0f);
         sensor.AddObservation(weaponManager.HasWeapon() ? 1f : 0f);
+        sensor.AddObservation(movement.IsOnHighGround ? 1f : 0f);
+
+        float distToNearestLever = 20f;
+        BrakeLever[] levers = FindObjectsByType<BrakeLever>(FindObjectsSortMode.None);
+        foreach (var lever in levers)
+        {
+            float d = Vector3.Distance(enemyBody.position, lever.transform.position);
+            if (d < distToNearestLever) distToNearestLever = d;
+        }
+        sensor.AddObservation(distToNearestLever / 20f);
     }
 
     public override void OnActionReceived(ActionBuffers actions)

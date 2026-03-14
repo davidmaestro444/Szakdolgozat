@@ -73,6 +73,8 @@ public class BrakeLever : MonoBehaviour
             if (charBase.Grounded && !charBase.IsOnHighGround)
             {
                 charBase.ApplyKnockback(new Vector2(brakeForce, 1f), stunDuration);
+                Fighter agent = charBase.GetComponent<Fighter>();
+                if (agent != null) agent.AddReward(-0.2f);
             }
         }
     }
