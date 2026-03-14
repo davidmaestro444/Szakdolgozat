@@ -229,6 +229,7 @@ MonoBehaviour:
   m_SensorName: SurroundingsSensor
   m_DetectableTags:
   - Ground
+  - HighGround
   m_RaysPerDirection: 4
   m_MaxRayDegrees: 90
   m_SphereCastRadius: 0.5

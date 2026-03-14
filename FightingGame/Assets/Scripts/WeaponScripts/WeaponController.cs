@@ -20,7 +20,6 @@ public abstract class WeaponController : MonoBehaviour
         SetupReferences();
     }
 
-
     protected void SetupReferences()
     {
         if (rb == null) rb = GetComponent<Rigidbody2D>();

@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 80013904}
   m_Layer: 10
   m_Name: vonat_kek_kocsi (2)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 285277490}
   m_Layer: 10
   m_Name: vonat_sarga_kocsi (1)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3293,7 +3293,7 @@ GameObject:
   - component: {fileID: 562725824}
   m_Layer: 10
   m_Name: vonat_kek_kocsi
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4483,7 +4483,7 @@ GameObject:
   - component: {fileID: 938413853}
   m_Layer: 10
   m_Name: vonat_mozdony
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4691,7 +4691,7 @@ GameObject:
   - component: {fileID: 1020201231}
   m_Layer: 10
   m_Name: vonat_szen
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4832,7 +4832,7 @@ GameObject:
   - component: {fileID: 1030937628}
   m_Layer: 10
   m_Name: vonat_piros_kocsi (2)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5245,7 +5245,7 @@ GameObject:
   - component: {fileID: 1163387002}
   m_Layer: 10
   m_Name: vonat_kek_kocsi (1)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5489,7 +5489,7 @@ GameObject:
   - component: {fileID: 1309800552}
   m_Layer: 10
   m_Name: vonat_sarga_kocsi (2)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6217,7 +6217,7 @@ GameObject:
   - component: {fileID: 1537535124}
   m_Layer: 10
   m_Name: vonat_piros_kocsi
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6880,7 +6880,7 @@ GameObject:
   - component: {fileID: 1861117638}
   m_Layer: 10
   m_Name: vonat_piros_kocsi (1)
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7107,7 +7107,7 @@ GameObject:
   - component: {fileID: 2022829910}
   m_Layer: 10
   m_Name: vonat_sarga_kocsi
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

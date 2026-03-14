@@ -1,0 +1,30 @@
+{
+    "FightingBehavior": {
+        "elo": 1124.923204387495,
+        "checkpoints": [
+            {
+                "steps": 146564,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-146564.onnx",
+                "reward": -0.2927222131854958,
+                "creation_time": 1773485822.0489345,
+                "auxillary_file_paths": [
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-146564.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 146564,
+            "file_path": "results\\FighterTest_1\\FightingBehavior.onnx",
+            "reward": -0.2927222131854958,
+            "creation_time": 1773485822.0489345,
+            "auxillary_file_paths": [
+                "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-146564.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.2.0.dev0",
+        "torch_version": "2.5.1+cu121"
+    }
+}

@@ -44,6 +44,8 @@ public class WeaponManager : MonoBehaviour
     {
         if (currentWeapon == null) return;
         currentWeapon.Throw(direction, transform.root.tag);
+        WeaponThrow wt = currentWeapon.GetComponent<WeaponThrow>();
+        if (wt != null) wt.WeaponThrown();
         currentWeapon = null;
     }
 
@@ -61,6 +63,8 @@ public class WeaponManager : MonoBehaviour
                 currentWeapon = foundWeapon;
                 currentWeapon.transform.SetParent(handSocket);
                 currentWeapon.OnEquip();
+                WeaponThrow wt = currentWeapon.GetComponent<WeaponThrow>();
+                if (wt != null) wt.WeaponPickUp();
                 return true;
             }
         }
