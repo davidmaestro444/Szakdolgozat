@@ -1,24 +1,24 @@
 {
     "FightingBehavior": {
-        "elo": 1124.923204387495,
+        "elo": 1083.6818213983156,
         "checkpoints": [
             {
-                "steps": 146564,
-                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-146564.onnx",
-                "reward": -0.2927222131854958,
-                "creation_time": 1773485822.0489345,
+                "steps": 148271,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-148271.onnx",
+                "reward": -0.10772702918719437,
+                "creation_time": 1773498385.6661005,
                 "auxillary_file_paths": [
-                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-146564.pt"
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-148271.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 146564,
+            "steps": 148271,
             "file_path": "results\\FighterTest_1\\FightingBehavior.onnx",
-            "reward": -0.2927222131854958,
-            "creation_time": 1773485822.0489345,
+            "reward": -0.10772702918719437,
+            "creation_time": 1773498385.6661005,
             "auxillary_file_paths": [
-                "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-146564.pt"
+                "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-148271.pt"
             ]
         }
     },

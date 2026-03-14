@@ -105,20 +105,31 @@ public class Fighter : Agent
         movement.AIMove(moveX);
 
         int currentJump = actions.DiscreteActions[0];
-        if (currentJump == 1 && lastJumpAction == 0)
-        {
-            movement.AIJump();
-        }
+        if (currentJump == 1 && lastJumpAction == 0) movement.AIJump();
         lastJumpAction = currentJump;
 
         if (actions.DiscreteActions[1] == 1) movement.PerformAttack();
         if (actions.DiscreteActions[2] == 1) movement.PerformThrow();
+        if (actions.DiscreteActions[3] == 1 && playerMovement != null) playerMovement.aiInteractTriggered = true;
 
-        if (actions.DiscreteActions[3] == 1 && playerMovement != null)
+        AddReward(0.0001f);
+
+        if (enemyDamageBox != null && enemyDamageBox.isDead)
         {
-            playerMovement.aiInteractTriggered = true;
+            float velocityTowardsGoal = (isPlayerOne ? 1f : -1f) * movement.GetComponent<Rigidbody2D>().linearVelocity.x;
+            if (velocityTowardsGoal > 0.1f)
+            {
+                AddReward(0.002f);
+            }
         }
-        AddReward(-0.0002f);
+        else
+        {
+            float distToEnemy = Vector3.Distance(transform.position, enemyBody.position);
+            if (distToEnemy < 3.0f && actions.DiscreteActions[1] == 1)
+            {
+                AddReward(0.005f);
+            }
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
