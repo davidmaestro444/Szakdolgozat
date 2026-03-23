@@ -114,18 +114,35 @@ public class Fighter : Agent
 
         AddReward(0.0001f);
 
+        if (weaponManager.HasWeapon())
+        {
+            AddReward(0.0005f);
+        }
+
         if (enemyDamageBox != null && enemyDamageBox.isDead)
         {
             float velocityTowardsGoal = (isPlayerOne ? 1f : -1f) * movement.GetComponent<Rigidbody2D>().linearVelocity.x;
             if (velocityTowardsGoal > 0.1f)
             {
-                AddReward(0.002f);
+                AddReward(0.005f);
+            }
+            else
+            {
+                AddReward(-0.001f);
             }
         }
-        else
+        else if (enemyBody != null)
         {
             float distToEnemy = Vector3.Distance(transform.position, enemyBody.position);
-            if (distToEnemy < 3.0f && actions.DiscreteActions[1] == 1)
+            if (distToEnemy > 2.0f)
+            {
+                float velocityTowardsEnemy = movement.GetComponent<Rigidbody2D>().linearVelocity.x * Mathf.Sign(enemyBody.position.x - transform.position.x);
+                if (velocityTowardsEnemy > 0.1f)
+                {
+                    AddReward(0.0005f);
+                }
+            }
+            else if (distToEnemy <= 3.0f && actions.DiscreteActions[1] == 1)
             {
                 AddReward(0.005f);
             }
