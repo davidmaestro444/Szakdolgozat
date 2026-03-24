@@ -66,12 +66,7 @@ public class Fighter : Agent
 
         if (enemyBody == null || myTargetGoal == null)
         {
-            sensor.AddObservation(0f);
-            sensor.AddObservation(Vector3.zero);
-            sensor.AddObservation(0f);
-            sensor.AddObservation(0f);
-            sensor.AddObservation(0f);
-            sensor.AddObservation(0f);
+            for (int i = 0; i < 11; i++) sensor.AddObservation(0f);
             return;
         }
 
@@ -85,6 +80,7 @@ public class Fighter : Agent
         sensor.AddObservation(weaponManager.HasBow() ? 1f : 0f);
         sensor.AddObservation(weaponManager.HasWeapon() ? 1f : 0f);
         sensor.AddObservation(movement.IsOnHighGround ? 1f : 0f);
+        sensor.AddObservation(movement.transform.localScale.x > 0 ? 1f : -1f);
 
         float distToNearestLever = 20f;
         BrakeLever[] levers = FindObjectsByType<BrakeLever>(FindObjectsSortMode.None);
@@ -108,8 +104,11 @@ public class Fighter : Agent
         if (currentJump == 1 && lastJumpAction == 0) movement.AIJump();
         lastJumpAction = currentJump;
 
-        if (actions.DiscreteActions[1] == 1) movement.PerformAttack();
-        if (actions.DiscreteActions[2] == 1) movement.PerformThrow();
+        bool isAttacking = actions.DiscreteActions[1] == 1;
+        bool isThrowing = actions.DiscreteActions[2] == 1;
+
+        if (isAttacking) movement.PerformAttack();
+        if (isThrowing) movement.PerformThrow();
         if (actions.DiscreteActions[3] == 1 && playerMovement != null) playerMovement.aiInteractTriggered = true;
 
         AddReward(0.0001f);
@@ -121,6 +120,11 @@ public class Fighter : Agent
 
         if (enemyDamageBox != null && enemyDamageBox.isDead)
         {
+            if (isAttacking || isThrowing)
+            {
+                AddReward(-0.01f);
+            }
+
             float velocityTowardsGoal = (isPlayerOne ? 1f : -1f) * movement.GetComponent<Rigidbody2D>().linearVelocity.x;
             if (velocityTowardsGoal > 0.1f)
             {
@@ -128,11 +132,16 @@ public class Fighter : Agent
             }
             else
             {
-                AddReward(-0.001f);
+                AddReward(-0.002f);
             }
         }
         else if (enemyBody != null)
         {
+            if (isAttacking || isThrowing)
+            {
+                AddReward(-0.0005f);
+            }
+
             float distToEnemy = Vector3.Distance(transform.position, enemyBody.position);
             if (distToEnemy > 2.0f)
             {
@@ -141,10 +150,6 @@ public class Fighter : Agent
                 {
                     AddReward(0.0005f);
                 }
-            }
-            else if (distToEnemy <= 3.0f && actions.DiscreteActions[1] == 1)
-            {
-                AddReward(0.005f);
             }
         }
     }
