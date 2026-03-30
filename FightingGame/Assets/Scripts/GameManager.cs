@@ -48,6 +48,8 @@ public class GameManager : MonoBehaviour
 
     public bool isTrainingMode = false;
 
+    public GameObject progressBar;
+
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(this); }
@@ -375,9 +377,14 @@ public class GameManager : MonoBehaviour
         }
 
         Time.timeScale = 0f;
+        if (p1Arrow != null) p1Arrow.SetActive(false);
+        if (p2Arrow != null) p2Arrow.SetActive(false);
+        if (progressBar != null) progressBar.SetActive(false);
+
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);
+
             if (winnerTag == "Player" || winnerTag == "Player1")
             {
                 winnerText.text = "PLAYER 1 WINS!";
@@ -388,7 +395,26 @@ public class GameManager : MonoBehaviour
                 winnerText.text = "PLAYER 2 WINS!";
                 winnerText.color = Color.red;
             }
+
+            StartCoroutine(FadeInVictoryPanel());
         }
+    }
+
+    private IEnumerator FadeInVictoryPanel()
+    {
+        CanvasGroup cg = victoryPanel.GetComponent<CanvasGroup>();
+        cg.alpha = 0f;
+
+        float fadeDuration = 2.0f;
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            cg.alpha = Mathf.Clamp01(elapsed / fadeDuration);
+
+            yield return null;
+        }
+        cg.alpha = 1f;
     }
 
     public void RestartGame()
