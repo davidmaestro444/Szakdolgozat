@@ -45,6 +45,11 @@ public class Fighter : Agent
         AddReward(0.5f);
     }
 
+    void OnEnemyHit()
+    {
+        AddReward(0.1f);
+    }
+
     public override void CollectObservations(VectorSensor sensor)
     {
         if (enemyDamageBox == null)
@@ -59,6 +64,7 @@ public class Fighter : Agent
                 if (enemyDamageBox != null && !enemyEventsSubscribed)
                 {
                     enemyDamageBox.OnDeath += OnEnemyKilled;
+                    enemyDamageBox.OnHit += OnEnemyHit;
                     enemyEventsSubscribed = true;
                 }
             }
@@ -142,13 +148,27 @@ public class Fighter : Agent
                 AddReward(-0.0005f);
             }
 
+            AddReward(-0.0002f);
+
             float distToEnemy = Vector3.Distance(transform.position, enemyBody.position);
-            if (distToEnemy > 2.0f)
+            float dirToEnemySign = Mathf.Sign(enemyBody.position.x - transform.position.x);
+            float myFacingDirection = movement.transform.localScale.x > 0 ? 1f : -1f;
+            bool isFacingEnemy = (dirToEnemySign == myFacingDirection);
+            float optimalAttackRange = weaponManager.HasBow() ? 7.0f : 2.0f;
+
+            if (distToEnemy > optimalAttackRange)
             {
-                float velocityTowardsEnemy = movement.GetComponent<Rigidbody2D>().linearVelocity.x * Mathf.Sign(enemyBody.position.x - transform.position.x);
+                float velocityTowardsEnemy = movement.GetComponent<Rigidbody2D>().linearVelocity.x * dirToEnemySign;
                 if (velocityTowardsEnemy > 0.1f)
                 {
                     AddReward(0.0005f);
+                }
+            }
+            else
+            {
+                if (isFacingEnemy && (isAttacking || isThrowing))
+                {
+                    AddReward(0.002f);
                 }
             }
         }
@@ -169,6 +189,7 @@ public class Fighter : Agent
         if (enemyDamageBox != null)
         {
             enemyDamageBox.OnDeath -= OnEnemyKilled;
+            enemyDamageBox.OnHit -= OnEnemyHit;
         }
     }
 
