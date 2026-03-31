@@ -619,8 +619,8 @@ GameObject:
   - component: {fileID: 6026700438554617569}
   - component: {fileID: 970191790684642630}
   - component: {fileID: 764445232581159731}
-  - component: {fileID: 6839012024030873805}
   - component: {fileID: 1418113196563870681}
+  - component: {fileID: 4846007142239943222}
   m_Layer: 9
   m_Name: Visuals
   m_TagString: Untagged
@@ -724,18 +724,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6839012024030873805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8049241145237901174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9912038dcf49f1944ac66d86ef030d78, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1418113196563870681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -755,6 +743,18 @@ MonoBehaviour:
   - {fileID: 1563000009595454135, guid: e65c5cf631539054c9ea87a54246fc83, type: 3}
   arrowPrefab: {fileID: 5009798662296737073, guid: 52c6dc863586037478f333ef653b9e1e,
     type: 3}
+--- !u!114 &4846007142239943222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8049241145237901174}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ace6e4c7da6ca0d488da3eaf24394b0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3608504458567271716
 PrefabInstance:
   m_ObjectHideFlags: 0

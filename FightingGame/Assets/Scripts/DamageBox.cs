@@ -14,7 +14,7 @@ public class DamageBox : MonoBehaviour
     public GameObject shieldVisual;
 
     private float hitCooldown = 0.15f;
-    private float lastHitTimestamp;
+    private float lastHitTimestamp = -1f;
 
     void Awake()
     {
@@ -56,6 +56,7 @@ public class DamageBox : MonoBehaviour
     {
         isDead = false;
         hasShield = false;
+        lastHitTimestamp = -1f;
         if (shieldVisual != null) shieldVisual.SetActive(false);
         gameObject.SetActive(true);
 
