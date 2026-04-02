@@ -258,23 +258,26 @@ public class GameManager : MonoBehaviour
         if (deadPlayers.Count == 2)
         {
             HandleDrawRespawn();
+            deadPlayers.Clear();
+            StartDuel();
         }
         else if (deadPlayers.Count == 1)
         {
-            HandleSingleRespawn(deadPlayers[0]);
+            GameObject loser = deadPlayers[0];
+            HandleSingleRespawn(loser);
+            bool isLoserAlive = !loser.GetComponent<DamageBox>().isDead;
+            deadPlayers.Clear();
+            if (isLoserAlive)
+            {
+                StartDuel();
+            }
         }
-
-        deadPlayers.Clear();
-        StartDuel();
     }
 
     private void HandleSingleRespawn(GameObject loser)
     {
         bool isPlayer1 = loser.CompareTag("Player");
         GameObject winner = isPlayer1 ? opponentInstance : playerInstance;
-
-        ResetPlayerState(loser);
-
         float camHeight = virtualCamera.Lens.OrthographicSize;
         float camWidth = camHeight * Camera.main.aspect;
         float camX = Camera.main.transform.position.x;
@@ -320,8 +323,8 @@ public class GameManager : MonoBehaviour
 
         if (selectedSpawn != null)
         {
+            ResetPlayerState(loser);
             loser.transform.position = selectedSpawn.position;
-            loser.SetActive(true);
         }
     }
 
@@ -333,7 +336,6 @@ public class GameManager : MonoBehaviour
         float safeLeftBound = (camX - camWidth) + wallSafeMargin;
         float safeRightBound = (camX + camWidth) - wallSafeMargin;
         List<Transform> visibleSpawns = spawnPoints.Where(sp => sp.position.x >= safeLeftBound && sp.position.x <= safeRightBound).OrderBy(sp => sp.position.x).ToList();
-
         ResetPlayerState(playerInstance);
         ResetPlayerState(opponentInstance);
 
@@ -341,18 +343,29 @@ public class GameManager : MonoBehaviour
         {
             playerInstance.transform.position = visibleSpawns.First().position;
             opponentInstance.transform.position = visibleSpawns.Last().position;
-
-            playerInstance.SetActive(true);
-            opponentInstance.SetActive(true);
         }
         else
         {
-            playerInstance.transform.position = new Vector3(safeLeftBound, playerInstance.transform.position.y, 0);
-            opponentInstance.transform.position = new Vector3(safeRightBound, opponentInstance.transform.position.y, 0);
+            List<Transform> allSortedSpawns = spawnPoints.OrderBy(sp => sp.position.x).ToList();
 
-            playerInstance.SetActive(true);
-            opponentInstance.SetActive(true);
+            if (allSortedSpawns.Count >= 2)
+            {
+                float midPointX = (allSortedSpawns.First().position.x + allSortedSpawns.Last().position.x) / 2f;
+
+                if (camX > midPointX)
+                {
+                    playerInstance.transform.position = allSortedSpawns[allSortedSpawns.Count - 2].position;
+                    opponentInstance.transform.position = allSortedSpawns[allSortedSpawns.Count - 1].position;
+                }
+                else
+                {
+                    playerInstance.transform.position = allSortedSpawns[0].position;
+                    opponentInstance.transform.position = allSortedSpawns[1].position;
+                }
+            }
         }
+        playerInstance.SetActive(true);
+        opponentInstance.SetActive(true);
     }
 
     private void ResetPlayerState(GameObject character)
@@ -384,7 +397,6 @@ public class GameManager : MonoBehaviour
         if (victoryPanel != null)
         {
             victoryPanel.SetActive(true);
-
             if (winnerTag == "Player" || winnerTag == "Player1")
             {
                 winnerText.text = "PLAYER 1 WINS!";
@@ -395,7 +407,6 @@ public class GameManager : MonoBehaviour
                 winnerText.text = "PLAYER 2 WINS!";
                 winnerText.color = Color.red;
             }
-
             StartCoroutine(FadeInVictoryPanel());
         }
     }
