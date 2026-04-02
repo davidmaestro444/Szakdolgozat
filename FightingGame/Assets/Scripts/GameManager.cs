@@ -231,46 +231,48 @@ public class GameManager : MonoBehaviour
 
     public void OnCharacterDied(GameObject character)
     {
-        if (!deadPlayers.Contains(character))
+        bool p1Dead = playerInstance.GetComponent<DamageBox>().isDead;
+        bool p2Dead = opponentInstance.GetComponent<DamageBox>().isDead;
+        if (respawnCoroutine != null)
         {
-            deadPlayers.Add(character);
+            StopCoroutine(respawnCoroutine);
         }
 
-        if (deadPlayers.Count == 1)
+        if (p1Dead && p2Dead)
         {
-            if (character.CompareTag("Player"))
+            SetGameState(GameState.Dueling);
+            respawnCoroutine = StartCoroutine(DrawRespawnRoutine());
+        }
+        else
+        {
+            if (p1Dead)
                 SetGameState(GameState.EnemyAdvancing);
             else
                 SetGameState(GameState.PlayerAdvancing);
 
-            respawnCoroutine = StartCoroutine(RespawnSequence());
-        }
-        else if (deadPlayers.Count == 2)
-        {
-            SetGameState(GameState.Dueling);
+            respawnCoroutine = StartCoroutine(SingleRespawnRoutine(character));
         }
     }
 
-    private IEnumerator RespawnSequence()
+
+    private IEnumerator DrawRespawnRoutine()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+        HandleDrawRespawn();
+        StartDuel();
+    }
+
+    private IEnumerator SingleRespawnRoutine(GameObject loser)
     {
         yield return new WaitForSeconds(respawnDelay);
 
-        if (deadPlayers.Count == 2)
+        HandleSingleRespawn(loser);
+        bool p1Dead = playerInstance.GetComponent<DamageBox>().isDead;
+        bool p2Dead = opponentInstance.GetComponent<DamageBox>().isDead;
+
+        if (!p1Dead && !p2Dead)
         {
-            HandleDrawRespawn();
-            deadPlayers.Clear();
             StartDuel();
-        }
-        else if (deadPlayers.Count == 1)
-        {
-            GameObject loser = deadPlayers[0];
-            HandleSingleRespawn(loser);
-            bool isLoserAlive = !loser.GetComponent<DamageBox>().isDead;
-            deadPlayers.Clear();
-            if (isLoserAlive)
-            {
-                StartDuel();
-            }
         }
     }
 
@@ -325,6 +327,7 @@ public class GameManager : MonoBehaviour
         {
             ResetPlayerState(loser);
             loser.transform.position = selectedSpawn.position;
+            loser.SetActive(true);
         }
     }
 
