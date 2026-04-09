@@ -117,7 +117,7 @@ public class Fighter : Agent
         if (isThrowing) movement.PerformThrow();
         if (actions.DiscreteActions[3] == 1 && playerMovement != null) playerMovement.aiInteractTriggered = true;
 
-        AddReward(0.0001f);
+        //AddReward(0.0001f);
 
         if (weaponManager.HasWeapon())
         {
@@ -168,7 +168,7 @@ public class Fighter : Agent
             {
                 if (isFacingEnemy && (isAttacking || isThrowing))
                 {
-                    AddReward(0.002f);
+                    AddReward(0.01f);
                 }
             }
         }

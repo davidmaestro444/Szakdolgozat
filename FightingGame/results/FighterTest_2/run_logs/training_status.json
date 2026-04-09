@@ -1,0 +1,57 @@
+{
+    "FightingBehavior": {
+        "elo": 976.1947043788867,
+        "checkpoints": [
+            {
+                "steps": 415238,
+                "file_path": "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-415238.onnx",
+                "reward": -0.8005999093875289,
+                "creation_time": 1775398168.1078963,
+                "auxillary_file_paths": [
+                    "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-415238.pt"
+                ]
+            },
+            {
+                "steps": 470256,
+                "file_path": "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-470256.onnx",
+                "reward": 7.707300650305115,
+                "creation_time": 1775721593.1233356,
+                "auxillary_file_paths": [
+                    "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-470256.pt"
+                ]
+            },
+            {
+                "steps": 499949,
+                "file_path": "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-499949.onnx",
+                "reward": -0.40960431554476207,
+                "creation_time": 1775722486.3830855,
+                "auxillary_file_paths": [
+                    "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-499949.pt"
+                ]
+            },
+            {
+                "steps": 587874,
+                "file_path": "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-587874.onnx",
+                "reward": null,
+                "creation_time": 1775724886.4776971,
+                "auxillary_file_paths": [
+                    "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-587874.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 587874,
+            "file_path": "results\\FighterTest_2\\FightingBehavior.onnx",
+            "reward": null,
+            "creation_time": 1775724886.4776971,
+            "auxillary_file_paths": [
+                "results\\FighterTest_2\\FightingBehavior\\FightingBehavior-587874.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.2.0.dev0",
+        "torch_version": "2.5.1+cu121"
+    }
+}
