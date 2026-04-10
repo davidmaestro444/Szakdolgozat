@@ -1,60 +1,60 @@
 {
     "FightingBehavior": {
-        "elo": 114.31498186203757,
+        "elo": -36.609641981406426,
         "checkpoints": [
             {
-                "steps": 1447036,
-                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1447036.onnx",
-                "reward": -0.1655724927317351,
-                "creation_time": 1775050305.784569,
+                "steps": 1851170,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1851170.onnx",
+                "reward": -0.13007582444697618,
+                "creation_time": 1775729264.0653315,
                 "auxillary_file_paths": [
-                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1447036.pt"
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1851170.pt"
                 ]
             },
             {
-                "steps": 1499966,
-                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1499966.onnx",
-                "reward": 0.8534375606686808,
-                "creation_time": 1775054124.6480024,
+                "steps": 1987947,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1987947.onnx",
+                "reward": 0.10528971021994948,
+                "creation_time": 1775823650.8130076,
                 "auxillary_file_paths": [
-                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1499966.pt"
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1987947.pt"
                 ]
             },
             {
-                "steps": 1519717,
-                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1519717.onnx",
-                "reward": -0.10098426592977423,
-                "creation_time": 1775054710.3659897,
-                "auxillary_file_paths": [
-                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1519717.pt"
-                ]
-            },
-            {
-                "steps": 1612338,
-                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1612338.onnx",
+                "steps": 1995947,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1995947.onnx",
                 "reward": null,
-                "creation_time": 1775119047.4393246,
+                "creation_time": 1775825524.1757252,
                 "auxillary_file_paths": [
-                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1612338.pt"
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1995947.pt"
                 ]
             },
             {
-                "steps": 1820467,
-                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1820467.onnx",
-                "reward": -0.13196249009342864,
-                "creation_time": 1775125294.7900016,
+                "steps": 1999960,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1999960.onnx",
+                "reward": -0.549869794644556,
+                "creation_time": 1775825786.070482,
                 "auxillary_file_paths": [
-                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1820467.pt"
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1999960.pt"
+                ]
+            },
+            {
+                "steps": 2006210,
+                "file_path": "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-2006210.onnx",
+                "reward": null,
+                "creation_time": 1775825930.5608075,
+                "auxillary_file_paths": [
+                    "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-2006210.pt"
                 ]
             }
         ],
         "final_checkpoint": {
-            "steps": 1820467,
+            "steps": 2006210,
             "file_path": "results\\FighterTest_1\\FightingBehavior.onnx",
-            "reward": -0.13196249009342864,
-            "creation_time": 1775125294.7900016,
+            "reward": null,
+            "creation_time": 1775825930.5608075,
             "auxillary_file_paths": [
-                "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-1820467.pt"
+                "results\\FighterTest_1\\FightingBehavior\\FightingBehavior-2006210.pt"
             ]
         }
     },

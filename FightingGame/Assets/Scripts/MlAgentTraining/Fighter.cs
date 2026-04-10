@@ -16,6 +16,7 @@ public class Fighter : Agent
     private DamageBox enemyDamageBox;
     private int lastJumpAction = 0;
     private bool enemyEventsSubscribed = false;
+    private float lastKnownDirection = 1f;
 
     public override void Initialize()
     {
@@ -72,7 +73,7 @@ public class Fighter : Agent
 
         if (enemyBody == null || myTargetGoal == null)
         {
-            for (int i = 0; i < 11; i++) sensor.AddObservation(0f);
+            for (int i = 0; i < 12; i++) sensor.AddObservation(0f);
             return;
         }
 
@@ -86,7 +87,8 @@ public class Fighter : Agent
         sensor.AddObservation(weaponManager.HasBow() ? 1f : 0f);
         sensor.AddObservation(weaponManager.HasWeapon() ? 1f : 0f);
         sensor.AddObservation(movement.IsOnHighGround ? 1f : 0f);
-        sensor.AddObservation(movement.transform.localScale.x > 0 ? 1f : -1f);
+        float myFacingDir = movement.transform.localScale.x > 0 ? 1f : -1f;
+        sensor.AddObservation(myFacingDir);
 
         float distToNearestLever = 20f;
         BrakeLever[] levers = FindObjectsByType<BrakeLever>(FindObjectsSortMode.None);
@@ -96,6 +98,18 @@ public class Fighter : Agent
             if (d < distToNearestLever) distToNearestLever = d;
         }
         sensor.AddObservation(distToNearestLever / 20f);
+
+        float velocityX = movement.GetComponent<Rigidbody2D>().linearVelocity.x;
+        if (Mathf.Abs(velocityX) > 0.1f)
+        {
+            lastKnownDirection = Mathf.Sign(velocityX);
+        }
+
+        Vector2 gapCheckPos = new Vector2(transform.position.x + (lastKnownDirection * 1.5f), transform.position.y);
+        RaycastHit2D groundHit = Physics2D.Raycast(gapCheckPos, Vector2.down, 5f, LayerMask.GetMask("Ground"));
+        bool isGapAhead = groundHit.collider == null;
+        sensor.AddObservation(isGapAhead ? 1f : 0f);
+        //Debug.DrawRay(gapCheckPos, Vector2.down * 5f, isGapAhead ? Color.red : Color.green);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
