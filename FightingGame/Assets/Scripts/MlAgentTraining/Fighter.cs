@@ -99,7 +99,7 @@ public class Fighter : Agent
         }
         sensor.AddObservation(distToNearestLever / 20f);
 
-        float velocityX = movement.GetComponent<Rigidbody2D>().linearVelocity.x;
+        /*float velocityX = movement.GetComponent<Rigidbody2D>().linearVelocity.x;
         if (Mathf.Abs(velocityX) > 0.1f)
         {
             lastKnownDirection = Mathf.Sign(velocityX);
@@ -109,7 +109,7 @@ public class Fighter : Agent
         RaycastHit2D groundHit = Physics2D.Raycast(gapCheckPos, Vector2.down, 5f, LayerMask.GetMask("Ground"));
         bool isGapAhead = groundHit.collider == null;
         sensor.AddObservation(isGapAhead ? 1f : 0f);
-        //Debug.DrawRay(gapCheckPos, Vector2.down * 5f, isGapAhead ? Color.red : Color.green);
+        //Debug.DrawRay(gapCheckPos, Vector2.down * 5f, isGapAhead ? Color.red : Color.green);*/
     }
 
     public override void OnActionReceived(ActionBuffers actions)

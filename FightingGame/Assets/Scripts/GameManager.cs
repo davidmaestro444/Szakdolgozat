@@ -402,12 +402,12 @@ public class GameManager : MonoBehaviour
             victoryPanel.SetActive(true);
             if (winnerTag == "Player" || winnerTag == "Player1")
             {
-                winnerText.text = "PLAYER 1 WINS!";
+                winnerText.text = "PLAYER 1 WINS";
                 winnerText.color = Color.cyan;
             }
             else
             {
-                winnerText.text = "PLAYER 2 WINS!";
+                winnerText.text = "PLAYER 2 WINS";
                 winnerText.color = Color.red;
             }
             StartCoroutine(FadeInVictoryPanel());

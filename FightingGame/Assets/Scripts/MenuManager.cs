@@ -14,12 +14,14 @@ public class MenuManager : MonoBehaviour
     public float blinkSpeed = 1.5f;
     public GameObject pvpButton;
     public GameObject pveButton;
+    public GameObject quitButton;
     private bool isWaitingForInput = false;
 
     private void Start()
     {
         pvpButton.SetActive(false);
         pveButton.SetActive(false);
+        quitButton.SetActive(false);
         pressAnyKeyText.gameObject.SetActive(false);
 
         if (animationFrames.Length > 0 && backgroundImage != null)
@@ -64,6 +66,7 @@ public class MenuManager : MonoBehaviour
 
         pvpButton.SetActive(true);
         pveButton.SetActive(true);
+        quitButton.SetActive(true);
     }
 
     public void PlayVsAI()
