@@ -138,7 +138,7 @@ public class GameManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
             count--;
         }
-        countdownText.text = "FIGHT!";
+        countdownText.text = "FIGHT";
         yield return new WaitForSeconds(0.5f);
         countdownText.gameObject.SetActive(false);
 

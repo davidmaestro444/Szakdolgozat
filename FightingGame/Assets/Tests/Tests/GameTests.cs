@@ -89,7 +89,7 @@ public class GameTests
     {
         GameObject go = new GameObject();
         WeaponManager wm = go.AddComponent<WeaponManager>();
-        GameObject bowObj = new GameObject("Elven_Bow_Weapon");
+        GameObject bowObj = new GameObject("LongBow");
         wm.currentWeapon = bowObj.AddComponent<BowController>();
         bool result = wm.HasBow();
 

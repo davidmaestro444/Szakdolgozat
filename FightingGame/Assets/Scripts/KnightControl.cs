@@ -78,5 +78,8 @@ public class KnightControl : MonoBehaviour
         }
     }
 
-    public void ResetState() => idle();
+    public void ResetState()
+    {
+        idle();
+    }
 }

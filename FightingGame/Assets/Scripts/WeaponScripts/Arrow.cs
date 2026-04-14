@@ -26,7 +26,7 @@ public class Arrow : MonoBehaviour
         rb.linearVelocity = new Vector2(direction * speed, 0);
         float targetAngle = (direction > 0) ? -90f : 90f;
         transform.rotation = Quaternion.Euler(0, 0, targetAngle);
-        Destroy(gameObject, 3f); //ez most ml agent miatt van itt
+        Destroy(gameObject, 3f);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
